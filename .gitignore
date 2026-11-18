@@ -6,3 +6,5 @@ DerivedData/
 .swiftpm/
 web/node_modules/
 .vercel/
+progress/
+.superpowers/

@@ -7,13 +7,13 @@ public enum PaymentLinks {
         var allowed = CharacterSet.urlQueryAllowed
         allowed.remove(charactersIn: "&+=#")
         let n = note.addingPercentEncoding(withAllowedCharacters: allowed) ?? ""
-        return URL(string: "https://venmo.com/u/\(h)?txn=pay&amount=\(amount(cents))&note=\(n)")
+        return URL(string: "https://venmo.com/u/\(h)?txn=pay&amount=\(decimal(cents))&note=\(n)")
     }
 
     public static func cashApp(tag: String, cents: Int) -> URL? {
         let t = strip(tag, "$")
         guard !t.isEmpty else { return nil }
-        return URL(string: "https://cash.app/$\(t)/\(amount(cents))")
+        return URL(string: "https://cash.app/$\(t)/\(decimal(cents))")
     }
 
     private static func strip(_ s: String, _ prefix: Character) -> String {
@@ -21,11 +21,13 @@ public enum PaymentLinks {
         return t.first == prefix ? String(t.dropFirst()) : t
     }
 
-    private static func amount(_ cents: Int) -> String {
-        String(format: "%d.%02d", cents / 100, cents % 100)
-    }
+}
+
+/// "20.50" for 2050; shared by the payment links and formatCents.
+private func decimal(_ cents: Int) -> String {
+    "\(cents / 100)." + String(format: "%02ld", cents % 100)
 }
 
 public func formatCents(_ cents: Int) -> String {
-    cents % 100 == 0 ? "$\(cents / 100)" : "$" + String(format: "%d.%02d", cents / 100, cents % 100)
+    cents % 100 == 0 ? "$\(cents / 100)" : "$" + decimal(cents)
 }

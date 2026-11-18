@@ -1,0 +1,364 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		13D4F075C0FC38DB5A4C60E6 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03544E870FFBF771D0481C8 /* WelcomeView.swift */; };
+		25355930FCEF6C5207A0205E /* DavatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856D4BB2B877E9CD1063D064 /* DavatApp.swift */; };
+		7D3ABE437EBB80B8848C6750 /* DavatKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7F7EB71BE21DD9E0FB4B9899 /* DavatKit */; };
+		F88668933A63EDA13896F04B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADF12EDB63608B1047D2E47F /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		49DBA636FC25302542CE6B76 /* Davat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Davat.entitlements; sourceTree = "<group>"; };
+		856D4BB2B877E9CD1063D064 /* DavatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DavatApp.swift; sourceTree = "<group>"; };
+		88466423B84BBF26888DDAB4 /* Davat.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Davat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ADF12EDB63608B1047D2E47F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BB80FCE0EDF86030114854B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		C03544E870FFBF771D0481C8 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		CB58263E07CED4497434AEA5 /* DavatKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DavatKit; path = DavatKit; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B0833310A8534C7BE5018530 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7D3ABE437EBB80B8848C6750 /* DavatKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		3BCB4F82130CCA94FCAFD5A7 /* Davat */ = {
+			isa = PBXGroup;
+			children = (
+				ADF12EDB63608B1047D2E47F /* Assets.xcassets */,
+				49DBA636FC25302542CE6B76 /* Davat.entitlements */,
+				856D4BB2B877E9CD1063D064 /* DavatApp.swift */,
+				BB80FCE0EDF86030114854B1 /* Info.plist */,
+				F958357FB432A4FEC955A4E6 /* Welcome */,
+			);
+			path = Davat;
+			sourceTree = "<group>";
+		};
+		5FFD0BD57D3903DF971F2DB2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				88466423B84BBF26888DDAB4 /* Davat.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A79065AF8610C48A5621ED10 = {
+			isa = PBXGroup;
+			children = (
+				3BCB4F82130CCA94FCAFD5A7 /* Davat */,
+				E9518ECE9A9A960746723F04 /* Packages */,
+				5FFD0BD57D3903DF971F2DB2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E9518ECE9A9A960746723F04 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				CB58263E07CED4497434AEA5 /* DavatKit */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		F958357FB432A4FEC955A4E6 /* Welcome */ = {
+			isa = PBXGroup;
+			children = (
+				C03544E870FFBF771D0481C8 /* WelcomeView.swift */,
+			);
+			path = Welcome;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		01EC8BAA7B3C401124A15B58 /* Davat */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D575704C9DE93679286169BC /* Build configuration list for PBXNativeTarget "Davat" */;
+			buildPhases = (
+				123818B73BA908F7D3EE4DE1 /* Sources */,
+				F8BFE764AC29308FC59916C4 /* Resources */,
+				B0833310A8534C7BE5018530 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Davat;
+			packageProductDependencies = (
+				7F7EB71BE21DD9E0FB4B9899 /* DavatKit */,
+			);
+			productName = Davat;
+			productReference = 88466423B84BBF26888DDAB4 /* Davat.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		27A581B0DD3ABDA04485F70F /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					01EC8BAA7B3C401124A15B58 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 0D54F0F4B688B223AAC6F736 /* Build configuration list for PBXProject "Davat" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = A79065AF8610C48A5621ED10;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				76EE66FEC4738F6B3A6E84DC /* XCLocalSwiftPackageReference "DavatKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 5FFD0BD57D3903DF971F2DB2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				01EC8BAA7B3C401124A15B58 /* Davat */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F8BFE764AC29308FC59916C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F88668933A63EDA13896F04B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		123818B73BA908F7D3EE4DE1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				25355930FCEF6C5207A0205E /* DavatApp.swift in Sources */,
+				13D4F075C0FC38DB5A4C60E6 /* WelcomeView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		7CF012346B91156B6D3E7F5B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		A291B091D2EDFFE409D3DBA9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		AD364BD4D89CE2D95B724793 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Davat/Davat.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Davat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.davat.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		E9CC038932D7164482C836A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Davat/Davat.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				INFOPLIST_FILE = Davat/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.davat.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0D54F0F4B688B223AAC6F736 /* Build configuration list for PBXProject "Davat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A291B091D2EDFFE409D3DBA9 /* Debug */,
+				7CF012346B91156B6D3E7F5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D575704C9DE93679286169BC /* Build configuration list for PBXNativeTarget "Davat" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AD364BD4D89CE2D95B724793 /* Debug */,
+				E9CC038932D7164482C836A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		76EE66FEC4738F6B3A6E84DC /* XCLocalSwiftPackageReference "DavatKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = DavatKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		7F7EB71BE21DD9E0FB4B9899 /* DavatKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DavatKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 27A581B0DD3ABDA04485F70F /* Project object */;
+}

@@ -2,11 +2,12 @@ import SwiftUI
 
 struct WelcomeView: View {
     @State private var shown = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
-            TimelineView(.animation) { timeline in
-                let t = timeline.date.timeIntervalSinceReferenceDate * 0.25
+            TimelineView(.animation(paused: reduceMotion)) { timeline in
+                let t = reduceMotion ? 0 : timeline.date.timeIntervalSinceReferenceDate * 0.25
                 MeshGradient(width: 3, height: 3, points: [
                     [0, 0], [0.5, 0], [1, 0],
                     [0, 0.5], [Float(0.5 + 0.15 * sin(t)), Float(0.5 + 0.15 * cos(t * 1.3))], [1, 0.5],
@@ -23,20 +24,23 @@ struct WelcomeView: View {
                 Spacer()
                 Text("davat")
                     .font(.system(size: 72, weight: .thin))
-                    .reveal(shown, delay: 0)
+                    .reveal(shown, reduceMotion, delay: 0)
                 Text("make the invite. send it. see who's in.")
                     .font(.system(size: 22, weight: .light))
                     .multilineTextAlignment(.center)
-                    .reveal(shown, delay: 0.1)
+                    .reveal(shown, reduceMotion, delay: 0.1)
                 Spacer()
                 VStack(spacing: 12) {
-                    Button("Get started") {}
+                    Button("Get started") { }
                         .buttonStyle(.glassProminent)
-                    Button("I have an account") {}
+                        .tint(.saffron)
+                        .frame(maxWidth: .infinity)
+                    Button("I have an account") { }
                         .buttonStyle(.glass)
+                        .frame(maxWidth: .infinity)
                 }
                 .controlSize(.large)
-                .reveal(shown, delay: 0.2)
+                .reveal(shown, reduceMotion, delay: 0.2)
             }
             .foregroundStyle(.white)
             .padding(24)
@@ -52,10 +56,10 @@ private extension Color {
 }
 
 private extension View {
-    func reveal(_ shown: Bool, delay: Double) -> some View {
+    func reveal(_ shown: Bool, _ reduceMotion: Bool, delay: Double) -> some View {
         opacity(shown ? 1 : 0)
-            .offset(y: shown ? 0 : 24)
-            .animation(.spring(duration: 0.4, bounce: 0.2).delay(delay), value: shown)
+            .offset(y: shown || reduceMotion ? 0 : 24)
+            .animation(reduceMotion ? .easeIn(duration: 0.3) : .spring(duration: 0.4, bounce: 0.2).delay(delay), value: shown)
     }
 }
 

@@ -11,7 +11,7 @@ Prerequisites: Xcode 27, an iOS 26 simulator, and XcodeGen (`brew install xcodeg
 ```sh
 xcodegen generate
 xcodebuild -project Davat.xcodeproj -scheme Davat \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build CODE_SIGNING_ALLOWED=NO
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' build CODE_SIGNING_ALLOWED=NO
 cd DavatKit && swift test
 ```
 

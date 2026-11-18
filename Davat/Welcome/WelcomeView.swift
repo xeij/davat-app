@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    let start: (AuthView.Mode) -> Void
     @State private var shown = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -31,13 +32,11 @@ struct WelcomeView: View {
                     .reveal(shown, reduceMotion, delay: 0.1)
                 Spacer()
                 VStack(spacing: 12) {
-                    Button("Get started") { }
+                    Button { start(.signUp) } label: { Text("Get started").frame(maxWidth: .infinity) }
                         .buttonStyle(.glassProminent)
                         .tint(.saffron)
-                        .frame(maxWidth: .infinity)
-                    Button("I have an account") { }
+                    Button { start(.signIn) } label: { Text("I have an account").frame(maxWidth: .infinity) }
                         .buttonStyle(.glass)
-                        .frame(maxWidth: .infinity)
                 }
                 .controlSize(.large)
                 .reveal(shown, reduceMotion, delay: 0.2)
@@ -63,4 +62,4 @@ private extension View {
     }
 }
 
-#Preview { WelcomeView() }
+#Preview { WelcomeView(start: { _ in }) }

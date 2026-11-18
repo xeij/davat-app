@@ -9,7 +9,11 @@
 /* Begin PBXBuildFile section */
 		13D4F075C0FC38DB5A4C60E6 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03544E870FFBF771D0481C8 /* WelcomeView.swift */; };
 		25355930FCEF6C5207A0205E /* DavatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856D4BB2B877E9CD1063D064 /* DavatApp.swift */; };
+		4B648CD517D7657C2AC756E2 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C386A86E808DCE130482B093 /* AuthView.swift */; };
+		4C401919A06101D60614ED8B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5EDAAE65D015DE05E30D50 /* ProfileView.swift */; };
+		6E7E812C6F1A9BC8C3AB36A8 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA690FFCCECAD0158DB6BEF /* Session.swift */; };
 		7D3ABE437EBB80B8848C6750 /* DavatKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7F7EB71BE21DD9E0FB4B9899 /* DavatKit */; };
+		8A91DFCCFD0E658644A7A01E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35B015C9395A0EF56FCA21F /* HomeView.swift */; };
 		F88668933A63EDA13896F04B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADF12EDB63608B1047D2E47F /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -20,7 +24,11 @@
 		ADF12EDB63608B1047D2E47F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BB80FCE0EDF86030114854B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C03544E870FFBF771D0481C8 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
+		C386A86E808DCE130482B093 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		CB58263E07CED4497434AEA5 /* DavatKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = DavatKit; path = DavatKit; sourceTree = SOURCE_ROOT; };
+		CE5EDAAE65D015DE05E30D50 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		DAA690FFCCECAD0158DB6BEF /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
+		E35B015C9395A0EF56FCA21F /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +43,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		299A494AFDF17907F234DFFF /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				E35B015C9395A0EF56FCA21F /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
 		3BCB4F82130CCA94FCAFD5A7 /* Davat */ = {
 			isa = PBXGroup;
 			children = (
@@ -42,6 +58,10 @@
 				49DBA636FC25302542CE6B76 /* Davat.entitlements */,
 				856D4BB2B877E9CD1063D064 /* DavatApp.swift */,
 				BB80FCE0EDF86030114854B1 /* Info.plist */,
+				DAA690FFCCECAD0158DB6BEF /* Session.swift */,
+				C3094C875FCA174E0E6321C3 /* Auth */,
+				299A494AFDF17907F234DFFF /* Home */,
+				989497E54210FDD838481955 /* Profile */,
 				F958357FB432A4FEC955A4E6 /* Welcome */,
 			);
 			path = Davat;
@@ -55,6 +75,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		989497E54210FDD838481955 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				CE5EDAAE65D015DE05E30D50 /* ProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
 		A79065AF8610C48A5621ED10 = {
 			isa = PBXGroup;
 			children = (
@@ -62,6 +90,14 @@
 				E9518ECE9A9A960746723F04 /* Packages */,
 				5FFD0BD57D3903DF971F2DB2 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		C3094C875FCA174E0E6321C3 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				C386A86E808DCE130482B093 /* AuthView.swift */,
+			);
+			path = Auth;
 			sourceTree = "<group>";
 		};
 		E9518ECE9A9A960746723F04 /* Packages */ = {
@@ -156,7 +192,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4B648CD517D7657C2AC756E2 /* AuthView.swift in Sources */,
 				25355930FCEF6C5207A0205E /* DavatApp.swift in Sources */,
+				8A91DFCCFD0E658644A7A01E /* HomeView.swift in Sources */,
+				4C401919A06101D60614ED8B /* ProfileView.swift in Sources */,
+				6E7E812C6F1A9BC8C3AB36A8 /* Session.swift in Sources */,
 				13D4F075C0FC38DB5A4C60E6 /* WelcomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

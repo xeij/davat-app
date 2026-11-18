@@ -44,7 +44,7 @@ public final class LocalBackend: Backend, @unchecked Sendable {
     static let localUser = UUID(uuidString: "00000000-0000-0000-0000-00000000DA7A")!
     private let dir: URL
     private let lock = NSLock()
-    private var watchers: [(invite: UUID, cont: AsyncStream<Void>.Continuation)] = []
+    private var watchers: [(token: UUID, invite: UUID, cont: AsyncStream<Void>.Continuation)] = []
     private let encoder: JSONEncoder = { let e = JSONEncoder(); e.dateEncodingStrategy = .iso8601; return e }()
     private let decoder: JSONDecoder = { let d = JSONDecoder(); d.dateDecodingStrategy = .iso8601; return d }()
 
@@ -159,7 +159,12 @@ public final class LocalBackend: Backend, @unchecked Sendable {
 
     public func changes(inviteID: UUID) -> AsyncStream<Void> {
         let (stream, cont) = AsyncStream<Void>.makeStream()
-        lock.withLock { watchers.append((inviteID, cont)) }
+        let token = UUID()
+        lock.withLock { watchers.append((token, inviteID, cont)) }
+        cont.onTermination = { [weak self] _ in
+            guard let self else { return }
+            lock.withLock { watchers.removeAll { $0.token == token } }
+        }
         return stream
     }
 }

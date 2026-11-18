@@ -20,6 +20,7 @@ struct DavatApp: App {
             }
             .animation(.spring(duration: 0.4, bounce: 0.2), value: authMode)
             .animation(.spring(duration: 0.4, bounce: 0.2), value: session.userID)
+            .onChange(of: session.userID) { if $1 == nil { authMode = nil } }
             .environment(session)
             .task { await session.restore() }
         }

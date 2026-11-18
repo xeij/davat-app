@@ -12,6 +12,8 @@ struct ProfileView: View {
 
     var body: some View {
         NavigationStack {
+            VStack(alignment: .leading, spacing: 0) {
+                Text("profile").font(.system(size: 40, weight: .thin)).padding(.horizontal, 24).padding(.top, 8)
             Form {
                 Section("you") {
                     TextField("display name", text: $name)
@@ -20,11 +22,12 @@ struct ProfileView: View {
                 }
                 if let error { Text(error).foregroundStyle(.red) }
                 Section {
-                    Button("Sign out") { Task { await session.signOut() } }
+                    Button("Sign out") { Task { do { try await session.signOut() } catch { self.error = error.localizedDescription } } }
                     Button("Delete account", role: .destructive) { confirmDelete = true }
                 }
             }
-            .navigationTitle("profile")
+            }
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) { Button("Save", action: save) }
             }
@@ -41,10 +44,14 @@ struct ProfileView: View {
         }
     }
 
+    private func strip(_ s: String, _ c: Character) -> String {
+        s.trimmingCharacters(in: .whitespaces).drop { $0 == c }.description
+    }
+
     private func save() {
         guard let id = session.userID else { return }
         Task {
-            do { try await session.saveProfile(Profile(id: id, displayName: name, venmo: venmo, cashtag: cashtag)); dismiss() }
+            do { try await session.saveProfile(Profile(id: id, displayName: name, venmo: strip(venmo, "@"), cashtag: strip(cashtag, "$"))); dismiss() }
             catch { self.error = error.localizedDescription }
         }
     }

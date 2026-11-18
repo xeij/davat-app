@@ -66,4 +66,19 @@ struct LocalBackendTests {
         try await b.signOut()
         #expect(await b.currentUserID() == nil)
     }
+
+    @Test func deleteAccountWipesEverything() async throws {
+        let b = make()
+        let id = try await b.signUp(email: "a@b.c", password: "secret1")
+        try await b.saveProfile(Profile(id: id, displayName: "a", venmo: "v", cashtag: "c"))
+        try await b.saveInvite(invite(id))
+        let path = try await b.uploadImage(Data([1, 2, 3]), path: "p/x.png")
+        let url = try #require(b.imageURL(path: path))
+        #expect(FileManager.default.fileExists(atPath: url.path))
+        try await b.deleteAccount()
+        #expect(try await b.myInvites().isEmpty)
+        #expect(try await b.profile() == nil)
+        #expect(await b.currentUserID() == nil)
+        #expect(!FileManager.default.fileExists(atPath: url.path))
+    }
 }

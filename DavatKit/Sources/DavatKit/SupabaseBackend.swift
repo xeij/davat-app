@@ -42,6 +42,13 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
             id = r.id; inviteID = r.inviteID; name = r.name; userID = r.userID
             guestToken = r.guestToken; rsvp = r.rsvp; paid = r.paid
         }
+        // id is left out so an upsert conflict keeps the existing row's primary key (DB defaults it on insert)
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(inviteID, forKey: .inviteID); try c.encode(name, forKey: .name)
+            try c.encode(userID, forKey: .userID); try c.encode(guestToken, forKey: .guestToken)
+            try c.encode(rsvp, forKey: .rsvp); try c.encode(paid, forKey: .paid)
+        }
         var response: Response {
             Response(id: id, inviteID: inviteID, name: name, userID: userID, guestToken: guestToken, rsvp: rsvp, paid: paid)
         }
@@ -124,12 +131,12 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
 
     public func changes(inviteID: UUID) -> AsyncStream<Void> {
         let client = client
+        let channel = client.channel("invite-\(inviteID.uuidString)")
+        let filter = RealtimePostgresFilter.eq("invite_id", value: inviteID.uuidString)
+        let r = channel.postgresChange(AnyAction.self, schema: "public", table: "responses", filter: filter)
+        let m = channel.postgresChange(AnyAction.self, schema: "public", table: "messages", filter: filter)
         return AsyncStream { cont in
             let task = Task {
-                let channel = client.channel("invite-\(inviteID.uuidString)")
-                let filter = RealtimePostgresFilter.eq("invite_id", value: inviteID.uuidString)
-                let r = channel.postgresChange(AnyAction.self, schema: "public", table: "responses", filter: filter)
-                let m = channel.postgresChange(AnyAction.self, schema: "public", table: "messages", filter: filter)
                 do { try await channel.subscribeWithError() } catch { cont.finish(); return }
                 await withTaskGroup(of: Void.self) { g in
                     g.addTask { for await _ in r { cont.yield() } }
@@ -139,7 +146,7 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
             }
             cont.onTermination = { _ in
                 task.cancel()
-                Task { await client.removeChannel(client.channel("invite-\(inviteID.uuidString)")) }
+                Task { await client.removeChannel(channel) }
             }
         }
     }

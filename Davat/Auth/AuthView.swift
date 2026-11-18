@@ -36,6 +36,7 @@ struct AuthView: View {
                     }
                 }
                 .signInWithAppleButtonStyle(scheme == .dark ? .white : .black)
+                .disabled(busy)
                 .frame(height: 54)
                 .clipShape(.capsule)
 

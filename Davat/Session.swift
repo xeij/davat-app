@@ -26,8 +26,8 @@ import SwiftUI
         profile = p
     }
 
-    func signOut() async {
-        try? await backend.signOut()
+    func signOut() async throws {
+        try await backend.signOut()
         withAnimation(.spring(duration: 0.4, bounce: 0.2)) { userID = nil; profile = nil }
     }
 

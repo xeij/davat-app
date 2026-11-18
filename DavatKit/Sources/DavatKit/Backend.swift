@@ -14,6 +14,8 @@ public protocol Backend: Sendable {
     func deleteInvite(id: UUID) async throws
     func uploadImage(_ png: Data, path: String) async throws -> String   // returns storage path
     func imageURL(path: String) -> URL?
+    func invite(id: UUID) async throws -> Invite?            // any invite by id, for guests
+    func summary(inviteID: UUID) async throws -> PublicSummary // guest-safe: no per-person paid
     func responses(inviteID: UUID) async throws -> [Response]
     func respond(_ r: Response) async throws        // upsert
     func setPaid(responseID: UUID, paid: Bool) async throws
@@ -122,6 +124,22 @@ public final class LocalBackend: Backend, @unchecked Sendable {
     }
     public func imageURL(path: String) -> URL? { dir.appending(path: "images/" + path) }
 
+    public func invite(id: UUID) async throws -> Invite? {
+        lock.withLock { (load("invites", [Invite].self) ?? []).first { $0.id == id } }
+    }
+    public func summary(inviteID: UUID) async throws -> PublicSummary {
+        lock.withLock {
+            let rs = (load("responses", [Response].self) ?? []).filter { $0.inviteID == inviteID }
+            let f = (load("invites", [Invite].self) ?? []).first { $0.id == inviteID }?.fundraiser
+            let s = f.map { summarize($0, responses: rs) }
+            let p = load("profile", Profile.self)
+            return PublicSummary(
+                guests: rs.sorted { $0.name < $1.name }.map { .init(name: $0.name, rsvp: $0.rsvp) },
+                goingCount: rs.filter { $0.rsvp == .going }.count,
+                goalCents: s?.goalCents ?? 0, raisedCents: s?.raisedCents ?? 0,
+                hostVenmo: p?.venmo ?? "", hostCashtag: p?.cashtag ?? "")
+        }
+    }
     public func responses(inviteID: UUID) async throws -> [Response] {
         lock.withLock { (load("responses", [Response].self) ?? []).filter { $0.inviteID == inviteID } }
     }

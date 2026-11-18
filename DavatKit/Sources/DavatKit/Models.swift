@@ -70,3 +70,24 @@ public struct Profile: Codable, Identifiable, Hashable, Sendable {
         self.id = id; self.displayName = displayName; self.venmo = venmo; self.cashtag = cashtag
     }
 }
+
+/// What a guest may see about an invite: names, rsvps and totals, never who paid.
+public struct PublicSummary: Codable, Hashable, Sendable {
+    public var guests: [Guest]
+    public var goingCount: Int
+    public var goalCents: Int
+    public var raisedCents: Int
+    public var hostVenmo: String
+    public var hostCashtag: String
+
+    public struct Guest: Codable, Hashable, Sendable {
+        public var name: String
+        public var rsvp: RSVP
+        public init(name: String, rsvp: RSVP) { self.name = name; self.rsvp = rsvp }
+    }
+
+    public init(guests: [Guest], goingCount: Int, goalCents: Int, raisedCents: Int, hostVenmo: String, hostCashtag: String) {
+        self.guests = guests; self.goingCount = goingCount; self.goalCents = goalCents
+        self.raisedCents = raisedCents; self.hostVenmo = hostVenmo; self.hostCashtag = hostCashtag
+    }
+}

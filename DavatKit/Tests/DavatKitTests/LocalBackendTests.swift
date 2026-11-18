@@ -81,4 +81,31 @@ struct LocalBackendTests {
         #expect(await b.currentUserID() == nil)
         #expect(!FileManager.default.fileExists(atPath: url.path))
     }
+
+    @Test func summaryHidesPaidAndTotals() async throws {
+        let b = make()
+        var inv = invite()
+        inv.fundraiser = Fundraiser(priceCents: 2000, hostPays: true)
+        try await b.saveInvite(inv)
+        try await b.saveProfile(Profile(id: UUID(), displayName: "h", venmo: "hv", cashtag: "hc"))
+        for (n, r, p) in [("a", RSVP.going, true), ("b", .going, false), ("c", .maybe, true)] {
+            try await b.respond(Response(id: UUID(), inviteID: inv.id, name: n, userID: nil, guestToken: n, rsvp: r, paid: p))
+        }
+        let s = try await b.summary(inviteID: inv.id)
+        #expect(s.goingCount == 2)
+        #expect(s.goalCents == 6000)
+        #expect(s.raisedCents == 4000)
+        #expect(s.guests.map(\.name) == ["a", "b", "c"])
+        #expect(s.hostVenmo == "hv" && s.hostCashtag == "hc")
+        let json = String(decoding: try JSONEncoder().encode(s), as: UTF8.self)
+        #expect(!json.contains("paid"))
+    }
+
+    @Test func inviteByID() async throws {
+        let b = make()
+        let i = invite()
+        try await b.saveInvite(i)
+        #expect(try await b.invite(id: i.id)?.id == i.id)
+        #expect(try await b.invite(id: UUID()) == nil)
+    }
 }

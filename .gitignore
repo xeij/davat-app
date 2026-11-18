@@ -1,0 +1,8 @@
+.DS_Store
+xcuserdata/
+DerivedData/
+.build/
+*.xcuserstate
+.swiftpm/
+web/node_modules/
+.vercel/

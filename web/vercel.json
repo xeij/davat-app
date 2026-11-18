@@ -1,0 +1,10 @@
+{
+  "rewrites": [{ "source": "/i/:id", "destination": "/api/invite?id=:id" }],
+  "headers": [
+    {
+      "source": "/.well-known/apple-app-site-association",
+      "headers": [{ "key": "Content-Type", "value": "application/json" }]
+    }
+  ],
+  "functions": { "api/invite.js": { "includeFiles": "{page.html,config.js}" } }
+}

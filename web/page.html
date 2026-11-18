@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="/config.js"></script>
+<title>davat</title>
+<meta name="theme-color" content="#0e0c0a">
+<link rel="stylesheet" href="/style.css">
+<script type="module" src="/app.js"></script>
+</head>
+<body>
+<div class="backdrop" id="backdrop"></div>
+
+<div class="envelope" id="envelope" hidden>
+  <div class="env">
+    <div class="env-back"></div>
+    <div class="env-card" id="env-card"></div>
+    <div class="env-front"></div>
+    <div class="env-flap"></div>
+  </div>
+  <p class="env-hint">tap to open</p>
+</div>
+
+<main id="app">
+  <section class="poster">
+    <img id="poster" alt="">
+    <canvas id="fx" aria-hidden="true"></canvas>
+  </section>
+
+  <section class="info">
+    <h1 id="title"></h1>
+    <p class="when" id="when"></p>
+    <p class="where" id="where"></p>
+    <p class="details" id="details"></p>
+  </section>
+
+  <section>
+    <h2>are you coming?</h2>
+    <div class="row">
+      <button class="glass" data-rsvp="going" aria-pressed="false">going</button>
+      <button class="glass" data-rsvp="maybe" aria-pressed="false">maybe</button>
+      <button class="glass" data-rsvp="cant" aria-pressed="false">can't</button>
+    </div>
+    <p class="note" id="rsvp-note" hidden>answering as <span id="me-name"></span>. <button class="link" id="rename">change name</button></p>
+  </section>
+
+  <section id="fund" hidden>
+    <div class="card">
+      <p class="eyebrow">chip in</p>
+      <p class="share"><span id="share"></span> each</p>
+      <div class="bar"><i id="bar"></i></div>
+      <p class="note" id="raised"></p>
+      <div class="row" id="pay"></div>
+      <button class="glass" id="paid">I paid</button>
+    </div>
+  </section>
+
+  <section>
+    <h2 id="guests-title">who's coming</h2>
+    <ul class="guests" id="guests"></ul>
+  </section>
+
+  <section>
+    <h2>chat</h2>
+    <ul class="messages" id="messages"></ul>
+    <form class="capsule" id="chat-form">
+      <input id="chat-input" maxlength="1000" placeholder="say something" autocomplete="off" aria-label="message">
+      <button class="send">send</button>
+    </form>
+  </section>
+
+  <footer>
+    <details id="report" hidden>
+      <summary>report this invite</summary>
+      <form id="report-form">
+        <textarea id="report-reason" maxlength="1000" required placeholder="what's wrong with it?"></textarea>
+        <button class="glass">send report</button>
+      </form>
+    </details>
+    <a href="/privacy.html">privacy</a>
+  </footer>
+</main>
+
+<dialog id="name-dialog">
+  <form method="dialog">
+    <h2>what's your name?</h2>
+    <p class="note">so the host knows who's coming.</p>
+    <input id="name-input" maxlength="60" required autocomplete="given-name" aria-label="your name">
+    <div class="row">
+      <button class="glass" type="button" id="name-cancel">cancel</button>
+      <button class="glass accent" value="ok">done</button>
+    </div>
+  </form>
+</dialog>
+
+<p class="toast" id="toast" role="status"></p>
+</body>
+</html>

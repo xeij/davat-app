@@ -48,10 +48,6 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
             case id, name, body
             case inviteID = "invite_id", userID = "user_id", guestToken = "guest_token", createdAt = "created_at"
         }
-        init(_ m: ChatMessage) {
-            id = m.id; inviteID = m.inviteID; name = m.name; userID = m.userID
-            guestToken = nil; body = m.body; createdAt = m.createdAt
-        }
         var message: ChatMessage {
             ChatMessage(id: id, inviteID: inviteID, name: name, userID: userID, body: body, createdAt: createdAt)
         }
@@ -98,8 +94,33 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
     }
     public func imageURL(path: String) -> URL? { try? client.storage.from("posters").getPublicURL(path: path) }
 
+    private struct InviteArg: Encodable {
+        var inviteID: UUID
+        enum CodingKeys: String, CodingKey { case inviteID = "invite_id" }
+    }
+    private struct SummaryRow: Decodable {
+        var guests: [PublicSummary.Guest], goingCount: Int, goalCents: Int?, raisedCents: Int?
+        var hostVenmo: String?, hostCashtag: String?
+        enum CodingKeys: String, CodingKey {
+            case guests, goingCount = "going_count", goalCents = "goal_cents", raisedCents = "raised_cents"
+            case hostVenmo = "host_venmo", hostCashtag = "host_cashtag"
+        }
+    }
+
+    public func invite(id: UUID) async throws -> Invite? {
+        let rows: [InviteRow] = try await client.rpc("get_invite", params: InviteArg(inviteID: id)).execute().value
+        return rows.first?.invite
+    }
+    public func summary(inviteID: UUID) async throws -> PublicSummary {
+        let rows: [SummaryRow] = try await client.rpc("invite_public_summary", params: InviteArg(inviteID: inviteID)).execute().value
+        guard let r = rows.first else { throw BackendError("invite not found") }
+        return PublicSummary(guests: r.guests, goingCount: r.goingCount, goalCents: r.goalCents ?? 0,
+                             raisedCents: r.raisedCents ?? 0, hostVenmo: r.hostVenmo ?? "", hostCashtag: r.hostCashtag ?? "")
+    }
+
     public func responses(inviteID: UUID) async throws -> [Response] {
-        let rows: [ResponseRow] = try await client.from("responses").select().eq("invite_id", value: inviteID).execute().value
+        // guest_token is not readable, so list the columns instead of *
+        let rows: [ResponseRow] = try await client.from("responses").select("id,invite_id,name,user_id,rsvp,paid").eq("invite_id", value: inviteID).execute().value
         return rows.map(\.response)
     }
     private struct RespondParams: Encodable {
@@ -123,11 +144,22 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
     }
 
     public func messages(inviteID: UUID) async throws -> [ChatMessage] {
-        let rows: [MessageRow] = try await client.from("messages").select().eq("invite_id", value: inviteID)
-            .order("created_at", ascending: true).execute().value
+        let rows: [MessageRow] = try await client.rpc("invite_messages", params: InviteArg(inviteID: inviteID)).execute().value
         return rows.map(\.message)
     }
-    public func send(_ m: ChatMessage) async throws { try await client.from("messages").insert(MessageRow(m)).execute() }
+    private struct PostArgs: Encodable {
+        var inviteID: UUID, name: String, body: String
+        enum CodingKeys: String, CodingKey { case name, body; case inviteID = "invite_id", guestToken = "guest_token" }
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(inviteID, forKey: .inviteID); try c.encode(name, forKey: .name)
+            try c.encodeNil(forKey: .guestToken); try c.encode(body, forKey: .body)
+        }
+    }
+    /// post_message sets user_id from the session. ChatMessage carries no guest token, so guests post without one.
+    public func send(_ m: ChatMessage) async throws {
+        try await client.rpc("post_message", params: PostArgs(inviteID: m.inviteID, name: m.name, body: m.body)).execute()
+    }
 
     public func changes(inviteID: UUID) -> AsyncStream<Void> {
         let client = client
@@ -137,8 +169,15 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
         let m = channel.postgresChange(AnyAction.self, schema: "public", table: "messages", filter: filter)
         return AsyncStream { cont in
             let task = Task {
-                do { try await channel.subscribeWithError() } catch { cont.finish(); return }
+                // Realtime only reaches the host (RLS). Everyone also gets a 4 second tick so guests see updates.
+                try? await channel.subscribeWithError()
                 await withTaskGroup(of: Void.self) { g in
+                    g.addTask {
+                        while !Task.isCancelled {
+                            try? await Task.sleep(for: .seconds(4))
+                            if !Task.isCancelled { cont.yield() }
+                        }
+                    }
                     g.addTask { for await _ in r { cont.yield() } }
                     g.addTask { for await _ in m { cont.yield() } }
                 }

@@ -47,7 +47,7 @@ create index messages_invite_idx on public.messages (invite_id, created_at);
 
 create table public.reports (
   id uuid primary key default gen_random_uuid(),
-  invite_id uuid not null references public.invites on delete cascade,
+  invite_id uuid not null, -- no FK, so reports outlive a deleted invite
   reason text not null check (length(reason) between 1 and 1000),
   created_at timestamptz not null default now()
 );
@@ -62,17 +62,22 @@ alter table public.reports enable row level security;
 create policy profiles_own on public.profiles for all to authenticated
   using (id = auth.uid()) with check (id = auth.uid());
 
--- invites: anyone can read (the uuid is the secret), only the host writes
-create policy invites_read on public.invites for select to anon, authenticated using (true);
+-- Everything is closed to anon and public by default. Guests reach data only through the functions below.
+revoke all on public.profiles, public.invites, public.messages, public.reports from anon;
+
+-- invites: the host reads and writes their own. Guests use get_invite(id).
+create policy invites_host_read on public.invites for select to authenticated using (host_id = auth.uid());
 create policy invites_host_insert on public.invites for insert to authenticated with check (host_id = auth.uid());
 create policy invites_host_update on public.invites for update to authenticated
   using (host_id = auth.uid()) with check (host_id = auth.uid());
 create policy invites_host_delete on public.invites for delete to authenticated using (host_id = auth.uid());
 
 -- responses: anon has no direct access. Guests write through respond() and read through invite_public_summary().
+-- Column grants: nobody reads guest_token directly and the host can edit only paid.
 revoke all on public.responses from anon;
-revoke update on public.responses from authenticated;
-grant update (paid) on public.responses to authenticated; -- host marks paid; nothing else is editable directly
+revoke select, update on public.responses from authenticated;
+grant select (id, invite_id, name, user_id, rsvp, paid) on public.responses to authenticated;
+grant update (paid) on public.responses to authenticated;
 create policy responses_host_read on public.responses for select to authenticated
   using (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()));
 create policy responses_own_read on public.responses for select to authenticated using (user_id = auth.uid());
@@ -80,16 +85,20 @@ create policy responses_host_paid on public.responses for update to authenticate
   using (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()))
   with check (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()));
 
--- messages: anyone can read and post; a signed-in sender can only post as themselves
-create policy messages_read on public.messages for select to anon, authenticated using (true);
-create policy messages_insert on public.messages for insert to anon, authenticated
-  with check (user_id is null or user_id = auth.uid());
+-- messages: no direct writes. Guests use invite_messages() and post_message(); the host also reads their invites'
+-- messages directly (for realtime), without guest_token.
+revoke select, insert, update, delete on public.messages from authenticated;
+grant select (id, invite_id, name, user_id, body, created_at) on public.messages to authenticated;
+create policy messages_host_read on public.messages for select to authenticated
+  using (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()));
 
 -- reports: write-only for clients; read them in the dashboard
+revoke all on public.reports from authenticated;
+grant insert on public.reports to anon, authenticated;
 create policy reports_insert on public.reports for insert to anon, authenticated with check (true);
 
--- Guests and signed-in users answer here. Returns the stored row, including its id.
-create function public.respond(invite_id uuid, guest_token text, name text, rsvp text, paid boolean default false)
+-- Guests and signed-in users answer here. Returns the stored row, including its id. A null paid keeps the old value.
+create function public.respond(invite_id uuid, guest_token text, name text, rsvp text, paid boolean default null)
 returns public.responses
 language plpgsql security definer set search_path = ''
 as $$
@@ -98,19 +107,19 @@ declare
   result public.responses;
 begin
   if uid is not null then
-    insert into public.responses (invite_id, user_id, name, rsvp, paid)
+    insert into public.responses as t (invite_id, user_id, name, rsvp, paid)
     values (respond.invite_id, uid, respond.name, respond.rsvp, coalesce(respond.paid, false))
     on conflict on constraint responses_user_unique
-    do update set name = excluded.name, rsvp = excluded.rsvp, paid = excluded.paid
+    do update set name = excluded.name, rsvp = excluded.rsvp, paid = coalesce(respond.paid, t.paid)
     returning * into result;
   else
     if respond.guest_token is null or length(respond.guest_token) < 16 then
       raise exception 'guest_token must be at least 16 characters';
     end if;
-    insert into public.responses (invite_id, guest_token, name, rsvp, paid)
+    insert into public.responses as t (invite_id, guest_token, name, rsvp, paid)
     values (respond.invite_id, respond.guest_token, respond.name, respond.rsvp, coalesce(respond.paid, false))
     on conflict on constraint responses_guest_unique
-    do update set name = excluded.name, rsvp = excluded.rsvp, paid = excluded.paid
+    do update set name = excluded.name, rsvp = excluded.rsvp, paid = coalesce(respond.paid, t.paid)
     returning * into result;
   end if;
   return result;
@@ -148,14 +157,49 @@ create function public.delete_me() returns void
 language sql security definer set search_path = ''
 as $$ delete from auth.users where id = auth.uid(); $$;
 
-revoke execute on function public.respond, public.invite_public_summary, public.delete_me from public;
-grant execute on function public.respond, public.invite_public_summary to anon, authenticated;
+-- One invite by id, for guests. The uuid is the secret.
+create function public.get_invite(invite_id uuid) returns setof public.invites
+language sql stable security definer set search_path = ''
+as $$ select i.* from public.invites i where i.id = get_invite.invite_id; $$;
+
+-- Chat. A message never exposes guest_token.
+create type public.chat_message as (id uuid, invite_id uuid, name text, user_id uuid, body text, created_at timestamptz);
+
+create function public.invite_messages(invite_id uuid) returns setof public.chat_message
+language sql stable security definer set search_path = ''
+as $$
+  select m.id, m.invite_id, m.name, m.user_id, m.body, m.created_at
+  from public.messages m where m.invite_id = invite_messages.invite_id order by m.created_at, m.id;
+$$;
+
+-- user_id is always the caller (null for guests), so nobody can post as someone else.
+create function public.post_message(invite_id uuid, name text, guest_token text, body text) returns public.chat_message
+language sql security definer set search_path = ''
+as $$
+  insert into public.messages as m (invite_id, name, user_id, guest_token, body)
+  values (post_message.invite_id, post_message.name, auth.uid(), post_message.guest_token, post_message.body)
+  returning m.id, m.invite_id, m.name, m.user_id, m.body, m.created_at;
+$$;
+
+-- New functions are executable by anon by default, so revoke explicitly, then grant.
+revoke execute on function public.respond, public.invite_public_summary, public.delete_me, public.get_invite,
+  public.invite_messages, public.post_message from public, anon, authenticated;
+grant execute on function public.respond, public.invite_public_summary, public.get_invite,
+  public.invite_messages, public.post_message to anon, authenticated;
 grant execute on function public.delete_me to authenticated;
 
--- Posters: public read, signed-in users write only under <uid>/
+-- Keep updated_at honest on every edit
+create function public.touch_updated_at() returns trigger language plpgsql set search_path = ''
+as $$ begin new.updated_at = now(); return new; end; $$;
+create trigger invites_touch before update on public.invites
+  for each row execute function public.touch_updated_at();
+
+-- Posters: public download by URL, signed-in users write only under <uid>/
 insert into storage.buckets (id, name, public) values ('posters', 'posters', true) on conflict (id) do nothing;
 
-create policy posters_read on storage.objects for select to anon, authenticated using (bucket_id = 'posters');
+-- No list access for anon: public bucket URLs download without a select policy. Owners can list their own folder.
+create policy posters_read on storage.objects for select to authenticated
+  using (bucket_id = 'posters' and (storage.foldername(name))[1] = auth.uid()::text);
 create policy posters_insert on storage.objects for insert to authenticated
   with check (bucket_id = 'posters' and (storage.foldername(name))[1] = auth.uid()::text);
 create policy posters_update on storage.objects for update to authenticated

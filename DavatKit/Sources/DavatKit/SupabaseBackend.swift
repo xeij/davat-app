@@ -6,7 +6,9 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
     private let client: SupabaseClient
 
     public init(url: URL, anonKey: String) {
-        client = SupabaseClient(supabaseURL: url, supabaseKey: anonKey)
+        // The session lives in the App Group's keychain so the iMessage extension shares the app's login.
+        client = SupabaseClient(supabaseURL: url, supabaseKey: anonKey, options: .init(
+            auth: .init(storage: KeychainLocalStorage(accessGroup: "group.com.davat.app"))))
     }
 
     private struct ProfileRow: Codable {

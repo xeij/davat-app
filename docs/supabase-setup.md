@@ -8,7 +8,7 @@ One-time setup for the backend. It takes about 15 minutes.
 4. Open Authentication, then Sign In / Providers (older dashboards: Providers under Configuration). Under Email, switch off "Confirm email" for v1. If you leave it on, sign-up creates no session: the new account cannot use the app until its owner taps the link in the confirmation email.
 5. Enable the Apple provider on the same page. In the "Client IDs" field enter the app's bundle ID, `com.davat.app`. Native Sign in with Apple needs no secret key. In the Apple Developer portal, the App ID for `com.davat.app` must have the Sign in with Apple capability turned on.
 6. Open Project Settings, then API. Copy the Project URL and the `anon` `public` key. Do not copy the `service_role` key; it must never go in the app or the web page.
-7. In `project.yml`, paste them into the `SupabaseURL` and `SupabaseAnonKey` entries under the Davat target's `info` properties, then run `xcodegen generate`. This writes them into `Davat/Info.plist`.
+7. In `project.yml`, paste them into the `SupabaseURL` and `SupabaseAnonKey` entries under the `info` properties of both the Davat and DavatMessages targets, then run `xcodegen generate`. This writes them into `Davat/Info.plist` and `DavatMessages/Info.plist`, so the iMessage extension talks to the same project.
 8. In `web/config.js`, paste the same two values into `supabaseURL` and `supabaseAnonKey`.
 9. Build and run the app. Sign up with an email, create an invite, and check that a row appears under Table Editor, then `invites`.
 

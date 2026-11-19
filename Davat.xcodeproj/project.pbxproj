@@ -19,10 +19,14 @@
 		4F8B646C374B237F69C456D3 /* EditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD3186B51361ECA5AA38B27 /* EditorModel.swift */; };
 		5EA97BF0A666695AEF464A9B /* InviteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECCA34280A8A6731BE00A485 /* InviteDetailView.swift */; };
 		6E7E812C6F1A9BC8C3AB36A8 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA690FFCCECAD0158DB6BEF /* Session.swift */; };
+		7174B26237062A1E4C291A02 /* DavatMessages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0F2BAACB5B49003304BC8C64 /* DavatMessages.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		74A24A1F6D7A05A4FA308FDF /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5B7EB6AF1BB76F0225D00C /* MessagesViewController.swift */; };
 		7D3ABE437EBB80B8848C6750 /* DavatKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7F7EB71BE21DD9E0FB4B9899 /* DavatKit */; };
 		8A91DFCCFD0E658644A7A01E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35B015C9395A0EF56FCA21F /* HomeView.swift */; };
+		9F2C7EEA140E2B557873EB01 /* BubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4947B8E505264006C03BCBB7 /* BubbleView.swift */; };
 		AC0711E82C6E43BEDDA11035 /* TemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E047CF3508A6142C08033D6 /* TemplatePicker.swift */; };
 		BDDABD0FB8ED3C009CEA3B8D /* GuestRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD1762FEEE95B0AF17EB24 /* GuestRow.swift */; };
+		C63E23835584F3C26D061178 /* DavatKit in Frameworks */ = {isa = PBXBuildFile; productRef = 29F4A6C4D3414C353D112DE7 /* DavatKit */; };
 		CF55CAB8B9D6585219FEB14C /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F296DC1ABC2908AED1DD9FF /* EditorView.swift */; };
 		DB3422BB75EE1FA556C34BD4 /* StickerPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD45D3C1515C76EBFFF9879C /* StickerPicker.swift */; };
 		F88668933A63EDA13896F04B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADF12EDB63608B1047D2E47F /* Assets.xcassets */; };
@@ -30,6 +34,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		4321DC89D9EEBFFCD012A268 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27A581B0DD3ABDA04485F70F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1853863A789B03EFD830CF03;
+			remoteInfo = DavatMessages;
+		};
 		94D6E9CD7B03CFB8E95364E4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 27A581B0DD3ABDA04485F70F /* Project object */;
@@ -39,13 +50,30 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		0DB41EC68367FF0D60F22F7A /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7174B26237062A1E4C291A02 /* DavatMessages.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		0BBD1762FEEE95B0AF17EB24 /* GuestRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestRow.swift; sourceTree = "<group>"; };
 		0CD3186B51361ECA5AA38B27 /* EditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorModel.swift; sourceTree = "<group>"; };
+		0F2BAACB5B49003304BC8C64 /* DavatMessages.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = DavatMessages.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BDDD2F50E31FEEF42461052 /* PublishService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishService.swift; sourceTree = "<group>"; };
+		22F566C1F00862BDA029A457 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		282279F68B35044727D9B2D7 /* FontPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontPicker.swift; sourceTree = "<group>"; };
 		3F296DC1ABC2908AED1DD9FF /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
 		45CBED3FBCB7E6EB87BA49E5 /* LayerInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerInspector.swift; sourceTree = "<group>"; };
+		4947B8E505264006C03BCBB7 /* BubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BubbleView.swift; sourceTree = "<group>"; };
 		49DBA636FC25302542CE6B76 /* Davat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Davat.entitlements; sourceTree = "<group>"; };
 		4B3BDC67382BACD2526B6E83 /* DetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsView.swift; sourceTree = "<group>"; };
 		4F0D62FAA3E047CBD649E01C /* EditorFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorFlowTests.swift; sourceTree = "<group>"; };
@@ -53,6 +81,7 @@
 		856D4BB2B877E9CD1063D064 /* DavatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DavatApp.swift; sourceTree = "<group>"; };
 		88466423B84BBF26888DDAB4 /* Davat.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Davat.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADF12EDB63608B1047D2E47F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AE5B7EB6AF1BB76F0225D00C /* MessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewController.swift; sourceTree = "<group>"; };
 		BB80FCE0EDF86030114854B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C03544E870FFBF771D0481C8 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		C386A86E808DCE130482B093 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
@@ -63,6 +92,7 @@
 		DF576D7AD3547C0AEEF13783 /* DavatUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DavatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E35B015C9395A0EF56FCA21F /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		ECCA34280A8A6731BE00A485 /* InviteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteDetailView.swift; sourceTree = "<group>"; };
+		FAC376122408BE6304740CD6 /* DavatMessages.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DavatMessages.entitlements; sourceTree = "<group>"; };
 		FAD8E3F824AA2DC624B1E80A /* BackgroundPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -75,9 +105,28 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F14F9B775234CEE012550BB3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C63E23835584F3C26D061178 /* DavatKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		27B4B0143B315DA651955EEE /* DavatMessages */ = {
+			isa = PBXGroup;
+			children = (
+				4947B8E505264006C03BCBB7 /* BubbleView.swift */,
+				FAC376122408BE6304740CD6 /* DavatMessages.entitlements */,
+				22F566C1F00862BDA029A457 /* Info.plist */,
+				AE5B7EB6AF1BB76F0225D00C /* MessagesViewController.swift */,
+			);
+			path = DavatMessages;
+			sourceTree = "<group>";
+		};
 		299A494AFDF17907F234DFFF /* Home */ = {
 			isa = PBXGroup;
 			children = (
@@ -131,6 +180,7 @@
 			isa = PBXGroup;
 			children = (
 				88466423B84BBF26888DDAB4 /* Davat.app */,
+				0F2BAACB5B49003304BC8C64 /* DavatMessages.appex */,
 				DF576D7AD3547C0AEEF13783 /* DavatUITests.xctest */,
 			);
 			name = Products;
@@ -157,6 +207,7 @@
 			isa = PBXGroup;
 			children = (
 				3BCB4F82130CCA94FCAFD5A7 /* Davat */,
+				27B4B0143B315DA651955EEE /* DavatMessages */,
 				2C32278A54812BD338168F9C /* DavatUITests */,
 				E9518ECE9A9A960746723F04 /* Packages */,
 				5FFD0BD57D3903DF971F2DB2 /* Products */,
@@ -206,10 +257,12 @@
 				123818B73BA908F7D3EE4DE1 /* Sources */,
 				F8BFE764AC29308FC59916C4 /* Resources */,
 				B0833310A8534C7BE5018530 /* Frameworks */,
+				0DB41EC68367FF0D60F22F7A /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				7DBF5C169D815B8F4545F6AB /* PBXTargetDependency */,
 			);
 			name = Davat;
 			packageProductDependencies = (
@@ -218,6 +271,25 @@
 			productName = Davat;
 			productReference = 88466423B84BBF26888DDAB4 /* Davat.app */;
 			productType = "com.apple.product-type.application";
+		};
+		1853863A789B03EFD830CF03 /* DavatMessages */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 81265483DAA581344653F115 /* Build configuration list for PBXNativeTarget "DavatMessages" */;
+			buildPhases = (
+				175BA1E251BF062767264BC5 /* Sources */,
+				F14F9B775234CEE012550BB3 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DavatMessages;
+			packageProductDependencies = (
+				29F4A6C4D3414C353D112DE7 /* DavatKit */,
+			);
+			productName = DavatMessages;
+			productReference = 0F2BAACB5B49003304BC8C64 /* DavatMessages.appex */;
+			productType = "com.apple.product-type.app-extension.messages";
 		};
 		59A38ED155F2C7222B1FDA46 /* DavatUITests */ = {
 			isa = PBXNativeTarget;
@@ -250,6 +322,10 @@
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
 					};
+					1853863A789B03EFD830CF03 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
 					59A38ED155F2C7222B1FDA46 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
@@ -275,6 +351,7 @@
 			projectRoot = "";
 			targets = (
 				01EC8BAA7B3C401124A15B58 /* Davat */,
+				1853863A789B03EFD830CF03 /* DavatMessages */,
 				59A38ED155F2C7222B1FDA46 /* DavatUITests */,
 			);
 		};
@@ -316,6 +393,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		175BA1E251BF062767264BC5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9F2C7EEA140E2B557873EB01 /* BubbleView.swift in Sources */,
+				74A24A1F6D7A05A4FA308FDF /* MessagesViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4CF9A4C3C6FB7FAA0685A7E3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -331,6 +417,11 @@
 			isa = PBXTargetDependency;
 			target = 01EC8BAA7B3C401124A15B58 /* Davat */;
 			targetProxy = 94D6E9CD7B03CFB8E95364E4 /* PBXContainerItemProxy */;
+		};
+		7DBF5C169D815B8F4545F6AB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1853863A789B03EFD830CF03 /* DavatMessages */;
+			targetProxy = 4321DC89D9EEBFFCD012A268 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -351,6 +442,40 @@
 				TEST_TARGET_NAME = Davat;
 			};
 			name = Release;
+		};
+		296C942ABE31950F630C05A0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
+				CODE_SIGN_ENTITLEMENTS = DavatMessages/DavatMessages.entitlements;
+				INFOPLIST_FILE = DavatMessages/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.davat.app.messages;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		438AD45A2019C8D53494BD2D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "iMessage App Icon";
+				CODE_SIGN_ENTITLEMENTS = DavatMessages/DavatMessages.entitlements;
+				INFOPLIST_FILE = DavatMessages/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.davat.app.messages;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
 		};
 		7CF012346B91156B6D3E7F5B /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -540,6 +665,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
+		81265483DAA581344653F115 /* Build configuration list for PBXNativeTarget "DavatMessages" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				438AD45A2019C8D53494BD2D /* Debug */,
+				296C942ABE31950F630C05A0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
 		C20E5B16B53E1048C4174CE0 /* Build configuration list for PBXNativeTarget "DavatUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -568,6 +702,10 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		29F4A6C4D3414C353D112DE7 /* DavatKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DavatKit;
+		};
 		7F7EB71BE21DD9E0FB4B9899 /* DavatKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = DavatKit;

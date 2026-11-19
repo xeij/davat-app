@@ -35,7 +35,7 @@ const rpc = (fn, args) => (demo ? demoRpc(fn, args) : rest(`rpc/${fn}`, args));
 
 const demoState = {
   invite: {
-    id: "demo", title: "leila's 30th", starts_at: "2026-12-05T20:00:00", location: "the roof at 214 grand st",
+    id: "demo", title: "leila's 30th", starts_at: "2026-12-06T01:00:00Z", time_zone: "America/New_York", location: "the roof at 214 grand st",
     details: "dinner at 8, then dancing.\nbring a sweater, it gets windy up there.",
     design: { effect: "confetti", envelope: true }, poster_path: null, price_cents: 2000, host_pays: true,
   },
@@ -94,7 +94,7 @@ function askName() {
   d.showModal();
   return new Promise((resolve) =>
     d.addEventListener("close", () => {
-      const name = input.value.trim().slice(0, 60);
+      const name = [...input.value.trim()].slice(0, 60).join(""); // 60 code points, as Postgres counts
       if (d.returnValue !== "ok" || !name) return resolve(false);
       me.name = name;
       save(KEY, me);
@@ -109,7 +109,7 @@ function paint() {
   $("#rsvp-note").hidden = !me.name;
   $("#me-name").textContent = me.name;
   $("#paid").disabled = me.paid;
-  $("#paid").textContent = me.paid ? "marked as paid, thanks" : "I paid";
+  $("#paid").textContent = me.paid ? "marked as going and paid" : "I paid";
 }
 
 // paid: true only from the "I paid" button; null keeps whatever the host or an earlier tap set.
@@ -131,7 +131,7 @@ async function answer(rsvp, paid = null) {
 }
 
 for (const b of document.querySelectorAll("[data-rsvp]")) b.onclick = () => answer(b.dataset.rsvp);
-$("#paid").onclick = () => answer(me.rsvp || "going", true);
+$("#paid").onclick = () => answer("going", true); // paying counts only when going
 $("#rename").onclick = async () => {
   if ((await askName()) && me.rsvp) answer(me.rsvp);
 };
@@ -211,7 +211,7 @@ function schedule() {
 $("#chat-form").onsubmit = async (e) => {
   e.preventDefault();
   const input = $("#chat-input");
-  const body = input.value.trim();
+  const body = [...input.value.trim()].slice(0, 1000).join("");
   if (!body || (!me.name && !(await askName()))) return;
   input.value = "";
   try {
@@ -351,6 +351,21 @@ function envelope(title) {
 
 // --- start
 
+// In the host's zone; invites saved before zones existed show the date only, in UTC.
+function when(iso, zone) {
+  const opts = { weekday: "long", month: "long", day: "numeric" };
+  try {
+    if (zone) return new Date(iso).toLocaleString(undefined, { ...opts, hour: "numeric", minute: "2-digit", timeZone: zone }).toLowerCase();
+  } catch {} // unknown zone
+  return new Date(iso).toLocaleDateString(undefined, { ...opts, timeZone: "UTC" }).toLowerCase();
+}
+
+// A republish overwrites the same file, which storage caches for an hour, so ask for this version.
+function posterURL(inv) {
+  const v = Date.parse(inv.updated_at);
+  return `${cfg.supabaseURL}/storage/v1/object/public/posters/${encodeURI(inv.poster_path)}${Number.isFinite(v) ? `?v=${Math.floor(v / 1000)}` : ""}`;
+}
+
 function fail(text, sub) {
   const main = document.createElement("main");
   main.className = "gone";
@@ -372,19 +387,13 @@ async function start() {
   if (!invite) return fail("this invite isn't here anymore", "the host may have deleted it. ask them for a fresh link.");
 
   document.title = invite.title || "davat";
-  const poster = invite.poster_path
-    ? `${cfg.supabaseURL}/storage/v1/object/public/posters/${encodeURI(invite.poster_path)}`
-    : demo ? "/demo-poster.svg" : "";
+  const poster = invite.poster_path ? posterURL(invite) : demo ? "/demo-poster.svg" : "";
   if (poster) {
     $("#poster").src = poster;
     $("#backdrop").style.backgroundImage = `url("${poster}")`;
   }
   $("#title").textContent = invite.title;
-  if (invite.starts_at) {
-    $("#when").textContent = new Date(invite.starts_at).toLocaleString(undefined, {
-      weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit",
-    }).toLowerCase();
-  }
+  if (invite.starts_at) $("#when").textContent = when(invite.starts_at, invite.time_zone);
   $("#where").textContent = invite.location;
   $("#details").textContent = invite.details;
   if (invite.price_cents != null) {
@@ -392,6 +401,10 @@ async function start() {
     $("#share").textContent = formatCents(invite.price_cents);
   }
   $("#report").hidden = demo;
+  if (location.hash === "#report" && !demo) { // the iMessage card's report link
+    $("#report").open = true;
+    $("#report").scrollIntoView();
+  }
 
   paint();
   if (invite.design?.envelope) envelope(invite.title);

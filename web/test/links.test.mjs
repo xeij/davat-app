@@ -19,6 +19,11 @@ test("handles strip prefixes", () => {
   assert.equal(cashApp("", 100), null);
 });
 
+test("handles drop other characters", () => {
+  assert.equal(venmo(" @le ila/<x>?", 100, "x"), "https://venmo.com/u/leilax?txn=pay&amount=1.00&note=x");
+  assert.equal(cashApp("$le_i-la#1", 100), "https://cash.app/$le_i-la1/1.00");
+});
+
 test("note keeps query-safe characters and encodes & + = #", () => {
   assert.equal(venmo("a", 100, "a&b+c=d#e $/:;?@,"), "https://venmo.com/u/a?txn=pay&amount=1.00&note=a%26b%2Bc%3Dd%23e%20$/:;?@,");
 });

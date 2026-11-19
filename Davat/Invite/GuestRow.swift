@@ -5,7 +5,7 @@ import SwiftUI
 struct GuestRow: View {
     let response: Response
     let showsPaid: Bool
-    let setPaid: (Bool) -> Void
+    let setPaid: @MainActor (Bool) -> Void
 
     var body: some View {
         Group {
@@ -20,5 +20,6 @@ struct GuestRow: View {
         }
         .font(.body.weight(.light))
         .padding(.vertical, 4)
+        .sensoryFeedback(.selection, trigger: response.paid)
     }
 }

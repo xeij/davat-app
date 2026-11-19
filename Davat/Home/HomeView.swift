@@ -14,6 +14,7 @@ struct HomeView: View {
         NavigationStack(path: $path) {
             VStack(alignment: .leading) {
                 Text("your invites").font(.system(size: 40, weight: .thin)).padding(.horizontal, 24)
+                    .accessibilityAddTraits(.isHeader)
                 if invites.isEmpty {
                     Text("nothing yet. make one.").font(.title3.weight(.light)).foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -41,6 +42,8 @@ struct HomeView: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .background { WarmTint() }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -56,6 +59,7 @@ struct HomeView: View {
             .sheet(isPresented: $showProfile) { ProfileView() }
             .sheet(isPresented: $showPicker) {
                 TemplatePicker { invite in
+                    UserDefaults.standard.set(false, forKey: InviteDetailView.envelopeKey(invite.id))   // fresh: reveal it once
                     showPicker = false
                     path = [invite]
                 }

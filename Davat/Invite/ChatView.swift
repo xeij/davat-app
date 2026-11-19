@@ -10,6 +10,7 @@ struct ChatView: View {
     @State private var draft = ""
     @State private var error: String?
     @State private var sending = false
+    @State private var sent = 0
 
     private var trimmed: String { draft.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var canSend: Bool { !sending && (1...1000).contains(trimmed.count) }
@@ -17,7 +18,7 @@ struct ChatView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                Text("chat").font(.system(size: 34, weight: .thin))
+                Text("chat").font(.system(size: 34, weight: .thin)).accessibilityAddTraits(.isHeader)
                     .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 16)
                 ScrollViewReader { proxy in
                     ScrollView {
@@ -55,6 +56,7 @@ struct ChatView: View {
             .toolbar { Button("Done") { dismiss() } }
         }
         .tint(.saffron)
+        .sensoryFeedback(.impact(weight: .light), trigger: sent)
         .task {
             await reload()
             for await _ in session.backend.changes(inviteID: invite.id) { await reload() }
@@ -88,7 +90,7 @@ struct ChatView: View {
         sending = true; defer { sending = false }
         do {
             try await session.backend.send(m)
-            draft = ""; error = nil
+            draft = ""; error = nil; sent += 1
             await reload()
         } catch { self.error = "couldn't send: \(error.localizedDescription)" }
     }

@@ -25,6 +25,7 @@ struct WelcomeView: View {
                 Spacer()
                 Text("davat")
                     .font(.system(size: 72, weight: .thin))
+                    .accessibilityAddTraits(.isHeader)
                     .reveal(shown, reduceMotion, delay: 0)
                 Text("make the invite. send it. see who's in.")
                     .font(.system(size: 22, weight: .light))
@@ -52,6 +53,27 @@ extension Color {
     static let saffron = Color(red: 0.851, green: 0.573, blue: 0.180)
     static let rose = Color(red: 0.62, green: 0.22, blue: 0.30)
     static let ink = Color(red: 0.09, green: 0.07, blue: 0.14)
+}
+
+/// The welcome mesh, still and faint, for screens with body text on them. Text keeps the usual primary colors.
+struct WarmTint: View {
+    @Environment(\.colorScheme) private var scheme
+
+    var body: some View {
+        let bg = Color(.systemBackground)
+        MeshGradient(width: 3, height: 3, points: [
+            [0, 0], [0.5, 0], [1, 0],
+            [0, 0.5], [0.5, 0.5], [1, 0.5],
+            [0, 1], [0.5, 1], [1, 1],
+        ], colors: [
+            .saffron, bg, .rose,
+            bg, bg, bg,
+            .rose, bg, .saffron,
+        ])
+        .opacity(scheme == .dark ? 0.22 : 0.12)
+        .background(bg)
+        .ignoresSafeArea()
+    }
 }
 
 private extension View {

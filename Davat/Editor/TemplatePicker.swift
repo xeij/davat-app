@@ -16,7 +16,7 @@ struct TemplatePicker: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
-                    Text("start with").font(.system(size: 40, weight: .thin))
+                    Text("start with").font(.system(size: 40, weight: .thin)).accessibilityAddTraits(.isHeader)
                     LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 18) {
                         tile("blank", Self.blank, blank: true)
                         ForEach(Templates.all, id: \.name) { tile($0.name, $0.design) }

@@ -20,6 +20,7 @@ struct AuthView: View {
             VStack(alignment: .leading, spacing: 20) {
                 Button("Back", systemImage: "chevron.left", action: back).buttonStyle(.glass)
                 Text("who's hosting?").font(.system(size: 40, weight: .thin)).padding(.top, 24)
+                    .accessibilityAddTraits(.isHeader)
 
                 SignInWithAppleButton(mode == .signUp ? .signUp : .signIn) { req in
                     nonce = Self.randomNonce()
@@ -69,6 +70,7 @@ struct AuthView: View {
             }
             .padding(24)
         }
+        .background { WarmTint() }
     }
 
     private func run(_ op: @escaping () async throws -> UUID) {

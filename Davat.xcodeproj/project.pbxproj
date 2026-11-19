@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		0732DB193F1F986082006B40 /* EditorFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F0D62FAA3E047CBD649E01C /* EditorFlowTests.swift */; };
 		13D4F075C0FC38DB5A4C60E6 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03544E870FFBF771D0481C8 /* WelcomeView.swift */; };
+		2410FF320C38054B44DAC673 /* PublishService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BDDD2F50E31FEEF42461052 /* PublishService.swift */; };
 		25355930FCEF6C5207A0205E /* DavatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856D4BB2B877E9CD1063D064 /* DavatApp.swift */; };
 		39F7E507EA969C132CA67FBB /* FontPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282279F68B35044727D9B2D7 /* FontPicker.swift */; };
 		3D8F15649966CE8087E30690 /* LayerInspector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45CBED3FBCB7E6EB87BA49E5 /* LayerInspector.swift */; };
@@ -16,13 +17,16 @@
 		4B648CD517D7657C2AC756E2 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C386A86E808DCE130482B093 /* AuthView.swift */; };
 		4C401919A06101D60614ED8B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5EDAAE65D015DE05E30D50 /* ProfileView.swift */; };
 		4F8B646C374B237F69C456D3 /* EditorModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CD3186B51361ECA5AA38B27 /* EditorModel.swift */; };
+		5EA97BF0A666695AEF464A9B /* InviteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECCA34280A8A6731BE00A485 /* InviteDetailView.swift */; };
 		6E7E812C6F1A9BC8C3AB36A8 /* Session.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA690FFCCECAD0158DB6BEF /* Session.swift */; };
 		7D3ABE437EBB80B8848C6750 /* DavatKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7F7EB71BE21DD9E0FB4B9899 /* DavatKit */; };
 		8A91DFCCFD0E658644A7A01E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35B015C9395A0EF56FCA21F /* HomeView.swift */; };
 		AC0711E82C6E43BEDDA11035 /* TemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E047CF3508A6142C08033D6 /* TemplatePicker.swift */; };
+		BDDABD0FB8ED3C009CEA3B8D /* GuestRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD1762FEEE95B0AF17EB24 /* GuestRow.swift */; };
 		CF55CAB8B9D6585219FEB14C /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F296DC1ABC2908AED1DD9FF /* EditorView.swift */; };
 		DB3422BB75EE1FA556C34BD4 /* StickerPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD45D3C1515C76EBFFF9879C /* StickerPicker.swift */; };
 		F88668933A63EDA13896F04B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADF12EDB63608B1047D2E47F /* Assets.xcassets */; };
+		FD25BBFDC5DAE3B437D5BC11 /* DetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B3BDC67382BACD2526B6E83 /* DetailsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,11 +40,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0BBD1762FEEE95B0AF17EB24 /* GuestRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuestRow.swift; sourceTree = "<group>"; };
 		0CD3186B51361ECA5AA38B27 /* EditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorModel.swift; sourceTree = "<group>"; };
+		1BDDD2F50E31FEEF42461052 /* PublishService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PublishService.swift; sourceTree = "<group>"; };
 		282279F68B35044727D9B2D7 /* FontPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontPicker.swift; sourceTree = "<group>"; };
 		3F296DC1ABC2908AED1DD9FF /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
 		45CBED3FBCB7E6EB87BA49E5 /* LayerInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerInspector.swift; sourceTree = "<group>"; };
 		49DBA636FC25302542CE6B76 /* Davat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Davat.entitlements; sourceTree = "<group>"; };
+		4B3BDC67382BACD2526B6E83 /* DetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsView.swift; sourceTree = "<group>"; };
 		4F0D62FAA3E047CBD649E01C /* EditorFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorFlowTests.swift; sourceTree = "<group>"; };
 		7E047CF3508A6142C08033D6 /* TemplatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePicker.swift; sourceTree = "<group>"; };
 		856D4BB2B877E9CD1063D064 /* DavatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DavatApp.swift; sourceTree = "<group>"; };
@@ -55,6 +62,7 @@
 		DD45D3C1515C76EBFFF9879C /* StickerPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerPicker.swift; sourceTree = "<group>"; };
 		DF576D7AD3547C0AEEF13783 /* DavatUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DavatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E35B015C9395A0EF56FCA21F /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		ECCA34280A8A6731BE00A485 /* InviteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteDetailView.swift; sourceTree = "<group>"; };
 		FAD8E3F824AA2DC624B1E80A /* BackgroundPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -109,8 +117,10 @@
 				BB80FCE0EDF86030114854B1 /* Info.plist */,
 				DAA690FFCCECAD0158DB6BEF /* Session.swift */,
 				C3094C875FCA174E0E6321C3 /* Auth */,
+				84860E5627977DD630172084 /* Create */,
 				2AC575A4D5B90BA100C5A9E2 /* Editor */,
 				299A494AFDF17907F234DFFF /* Home */,
+				C9171B0C770512DBDACE1C99 /* Invite */,
 				989497E54210FDD838481955 /* Profile */,
 				F958357FB432A4FEC955A4E6 /* Welcome */,
 			);
@@ -124,6 +134,15 @@
 				DF576D7AD3547C0AEEF13783 /* DavatUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		84860E5627977DD630172084 /* Create */ = {
+			isa = PBXGroup;
+			children = (
+				4B3BDC67382BACD2526B6E83 /* DetailsView.swift */,
+				1BDDD2F50E31FEEF42461052 /* PublishService.swift */,
+			);
+			path = Create;
 			sourceTree = "<group>";
 		};
 		989497E54210FDD838481955 /* Profile */ = {
@@ -150,6 +169,15 @@
 				C386A86E808DCE130482B093 /* AuthView.swift */,
 			);
 			path = Auth;
+			sourceTree = "<group>";
+		};
+		C9171B0C770512DBDACE1C99 /* Invite */ = {
+			isa = PBXGroup;
+			children = (
+				0BBD1762FEEE95B0AF17EB24 /* GuestRow.swift */,
+				ECCA34280A8A6731BE00A485 /* InviteDetailView.swift */,
+			);
+			path = Invite;
 			sourceTree = "<group>";
 		};
 		E9518ECE9A9A960746723F04 /* Packages */ = {
@@ -271,12 +299,16 @@
 				4B648CD517D7657C2AC756E2 /* AuthView.swift in Sources */,
 				497C4DB175D4FDF1B48D0870 /* BackgroundPicker.swift in Sources */,
 				25355930FCEF6C5207A0205E /* DavatApp.swift in Sources */,
+				FD25BBFDC5DAE3B437D5BC11 /* DetailsView.swift in Sources */,
 				4F8B646C374B237F69C456D3 /* EditorModel.swift in Sources */,
 				CF55CAB8B9D6585219FEB14C /* EditorView.swift in Sources */,
 				39F7E507EA969C132CA67FBB /* FontPicker.swift in Sources */,
+				BDDABD0FB8ED3C009CEA3B8D /* GuestRow.swift in Sources */,
 				8A91DFCCFD0E658644A7A01E /* HomeView.swift in Sources */,
+				5EA97BF0A666695AEF464A9B /* InviteDetailView.swift in Sources */,
 				3D8F15649966CE8087E30690 /* LayerInspector.swift in Sources */,
 				4C401919A06101D60614ED8B /* ProfileView.swift in Sources */,
+				2410FF320C38054B44DAC673 /* PublishService.swift in Sources */,
 				6E7E812C6F1A9BC8C3AB36A8 /* Session.swift in Sources */,
 				DB3422BB75EE1FA556C34BD4 /* StickerPicker.swift in Sources */,
 				AC0711E82C6E43BEDDA11035 /* TemplatePicker.swift in Sources */,

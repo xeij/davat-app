@@ -6,13 +6,12 @@ struct HomeView: View {
     @State private var invites: [Invite] = []
     @State private var showProfile = false
     @State private var showPicker = false
-    @State private var editing: Invite?
-    @State private var error: String?
+    @State private var path: [Invite] = []
     @State private var imagesReady = 0
     @Namespace private var zoom
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             VStack(alignment: .leading) {
                 Text("your invites").font(.system(size: 40, weight: .thin)).padding(.horizontal, 24)
                 if invites.isEmpty {
@@ -22,9 +21,9 @@ struct HomeView: View {
                     ScrollView {
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible(), spacing: 14)], spacing: 18) {
                             ForEach(invites) { invite in
-                                Button { editing = invite } label: {
+                                Button { path.append(invite) } label: {
                                     VStack(alignment: .leading, spacing: 6) {
-                                        CanvasView(design: invite.design, imageLoader: session.images.image)
+                                        CanvasView(design: invite.design, imageLoader: session.images.image, showsEffect: false)
                                             .clipShape(.rect(cornerRadius: 16))
                                             .matchedTransitionSource(id: invite.id, in: zoom)
                                         Text(invite.title).font(.subheadline.weight(.light))
@@ -56,40 +55,36 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showProfile) { ProfileView() }
             .sheet(isPresented: $showPicker) {
-                TemplatePicker { design in
+                TemplatePicker { invite in
                     showPicker = false
-                    save(Invite(id: UUID(), hostID: session.userID ?? UUID(), title: "untitled", design: design, updatedAt: .now))
+                    path = [invite]
                 }
             }
-            .fullScreenCover(item: $editing) { invite in
-                EditorView(design: invite.design) { design in
-                    editing = nil
-                    var updated = invite
-                    updated.design = design; updated.updatedAt = .now
-                    save(updated)
-                }
-                .navigationTransition(.zoom(sourceID: invite.id, in: zoom))
+            .navigationDestination(for: Invite.self) { invite in
+                InviteDetailView(invite: invite).navigationTransition(.zoom(sourceID: invite.id, in: zoom))
             }
-            .alert("couldn't save", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
-            } message: { Text(error ?? "") }
             .task { await load() }
+            .onChange(of: path) { Task { await refresh() } }   // back from a detail, or just published
         }
     }
 
     private func load() async {
-        invites = (try? await session.backend.myInvites()) ?? []
-        await prefetch()
+        await refresh()
         #if DEBUG
         let args = ProcessInfo.processInfo.arguments
         if args.contains("-demoSeed"), invites.isEmpty {
-            for t in Templates.all.prefix(2) {
-                try? await session.backend.saveInvite(Invite(id: UUID(), hostID: session.userID ?? UUID(), title: t.name,
-                                                             design: t.design, updatedAt: .now))
+            for (i, t) in Templates.all.prefix(2).enumerated() {
+                try? await session.backend.saveInvite(Invite(
+                    id: UUID(), hostID: session.userID ?? UUID(), title: t.name, startsAt: .now.addingTimeInterval(86400 * 9),
+                    location: "the rooftop on 5th", details: "bring a friend and your best moves",
+                    design: t.design, fundraiser: i == 0 ? Fundraiser(priceCents: 2000, hostPays: true) : nil, updatedAt: .now))
             }
             invites = (try? await session.backend.myInvites()) ?? []
         }
         if args.contains("-demoPicker") { showPicker = true }
-        if args.contains("-demoEditor") { editing = invites.first }
+        if ["-demoDetail", "-demoDetails", "-demoEditor", "-demoGuests"].contains(where: args.contains), let first = invites.first {
+            path = [first]
+        }
         #endif
     }
 
@@ -101,10 +96,8 @@ struct HomeView: View {
         imagesReady += 1
     }
 
-    private func save(_ invite: Invite) {
-        Task {
-            do { try await session.backend.saveInvite(invite) } catch { self.error = error.localizedDescription }
-            invites = (try? await session.backend.myInvites()) ?? []
-        }
+    private func refresh() async {
+        invites = (try? await session.backend.myInvites()) ?? []
+        await prefetch()
     }
 }

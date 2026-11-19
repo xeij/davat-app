@@ -2,7 +2,8 @@ import DavatKit
 import SwiftUI
 
 struct TemplatePicker: View {
-    let onDone: (Design) -> Void
+    let onPublished: (Invite) -> Void
+    @Environment(Session.self) private var session
     @Environment(\.dismiss) private var dismiss
     @Namespace private var zoom
     @State private var editing: Pick?
@@ -27,7 +28,8 @@ struct TemplatePicker: View {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel", systemImage: "xmark") { dismiss() } }
             }
             .fullScreenCover(item: $editing) { pick in
-                EditorView(design: pick.design, onDone: onDone)
+                InviteComposer(invite: Invite(id: UUID(), hostID: session.userID ?? UUID(), title: "", design: pick.design,
+                                              updatedAt: .now), onPublished: onPublished)
                     .navigationTransition(.zoom(sourceID: pick.id, in: zoom))
             }
         }

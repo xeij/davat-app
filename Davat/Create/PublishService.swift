@@ -1,0 +1,26 @@
+import DavatKit
+import SwiftUI
+
+@MainActor enum PublishService {
+    /// Renders the poster at 1080x1920, uploads it to "<hostID>/<inviteID>.png" (replacing any earlier
+    /// version, so the link stays the same), sets posterPath and saves the invite.
+    static func publish(_ invite: Invite, backend: any Backend, images: ImageStore) async throws -> Invite {
+        guard let png = await poster(invite.design, images: images)?.pngData() else {
+            throw BackendError("couldn't draw the poster")
+        }
+        var out = invite
+        out.posterPath = try await backend.uploadImage(png, path: PublishPaths.poster(hostID: invite.hostID, inviteID: invite.id))
+        out.updatedAt = .now
+        try await backend.saveInvite(out)
+        return out
+    }
+
+    /// The still poster: no effect, every image fetched first so none is missing.
+    static func poster(_ design: Design, images: ImageStore) async -> UIImage? {
+        await images.prefetch(paths: design.imagePaths)
+        let r = ImageRenderer(content: CanvasView(design: design, imageLoader: images.image, showsEffect: false)
+            .frame(width: 1080, height: 1920))
+        r.scale = 1
+        return r.uiImage
+    }
+}

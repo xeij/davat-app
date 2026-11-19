@@ -26,7 +26,14 @@ xcodebuild -project Davat.xcodeproj -scheme Davat \
 node --test web/test                 # payment links and the link preview function
 ```
 
-With no Supabase keys configured the app runs on `LocalBackend`, which stores everything as JSON files on the device, so the whole host flow works in the simulator without an account anywhere. `xcodebuild ... test` runs one UI test that taps through template, editor, details and publish against that local store.
+With no Supabase keys configured the app runs on `LocalBackend`, which stores everything as JSON files on the device, so the whole host flow works in the simulator without an account anywhere. One UI test taps through template, editor, details and publish against that local store:
+
+```sh
+xcodebuild -project Davat.xcodeproj -scheme Davat \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' test CODE_SIGNING_ALLOWED=NO
+```
+
+The destination simulator has to be installed (Xcode > Settings > Components); `xcrun simctl list devices` shows which ones are, and any iOS 26 iPhone works in its place.
 
 The guest web page runs from a plain static server and shows a built-in demo invite when it has no keys:
 

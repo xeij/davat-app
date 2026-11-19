@@ -82,18 +82,20 @@ struct InviteDetailView: View {
         .onAppear {
             let key = Self.envelopeKey(invite.id)
             guard UserDefaults.standard.object(forKey: key) as? Bool == false else { return }
-            UserDefaults.standard.set(true, forKey: key)
             published += 1
-            if !reduceMotion { envelope = .closed }
+            if reduceMotion { UserDefaults.standard.set(true, forKey: key) } else { envelope = .closed }
         }
         .task {
             guard envelope == .closed else { return }
-            try? await Task.sleep(for: .milliseconds(250))
-            withAnimation(.spring(duration: 0.4, bounce: 0.15)) { envelope = .flapOpen }
-            try? await Task.sleep(for: .milliseconds(350))
-            withAnimation(.spring(duration: 0.5, bounce: 0)) { envelope = .gone }
-            try? await Task.sleep(for: .milliseconds(500))
-            envelope = nil
+            do {   // leaving early cancels the sleeps, so the reveal plays again next time
+                try await Task.sleep(for: .milliseconds(250))
+                withAnimation(.spring(duration: 0.4, bounce: 0.15)) { envelope = .flapOpen }
+                try await Task.sleep(for: .milliseconds(350))
+                withAnimation(.spring(duration: 0.5, bounce: 0)) { envelope = .gone }
+                try await Task.sleep(for: .milliseconds(500))
+                envelope = nil
+                UserDefaults.standard.set(true, forKey: Self.envelopeKey(invite.id))
+            } catch {}
         }
         .alert("that didn't work", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
         } message: { Text(error ?? "") }
@@ -176,10 +178,11 @@ struct InviteDetailView: View {
         Task {
             do {
                 try await session.backend.deleteInvite(id: invite.id)
-                for path in [invite.posterPath].compactMap(\.self) + invite.design.imagePaths {
-                    try? await session.backend.deleteImage(path: path)   // best effort: the invite is already gone
-                }
                 dismiss()
+                let backend = session.backend, paths = [invite.posterPath].compactMap(\.self) + invite.design.imagePaths
+                Task.detached {   // best effort, after the screen is gone: the invite already is
+                    for path in paths { try? await backend.deleteImage(path: path) }
+                }
             }
             catch { self.error = error.localizedDescription }
         }
@@ -204,7 +207,8 @@ struct InviteDetailView: View {
     #endif
 }
 
-/// Covers the poster the first time a fresh invite is opened: the flap folds up, then the envelope drops away.
+/// Covers the poster the first time a fresh invite is opened: the flap swings open past upright, then the envelope
+/// fades and drops away. The hinge sits below the top edge so the open flap stays inside the poster's clip.
 private struct Envelope: View {
     enum Stage { case closed, flapOpen, gone }
     let stage: Stage
@@ -216,8 +220,9 @@ private struct Envelope: View {
                 Flap()
                     .fill(Color.saffron.mix(with: .white, by: 0.15))
                     .shadow(color: .black.opacity(0.2), radius: 6, y: 3)
-                    .frame(height: g.size.height * 0.42)
-                    .rotation3DEffect(.degrees(stage == .closed ? 0 : 170), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
+                    .frame(height: g.size.height * 0.36)
+                    .rotation3DEffect(.degrees(stage == .closed ? 0 : 110), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
+                    .padding(.top, g.size.height * 0.22)
             }
             .offset(y: stage == .gone ? g.size.height : 0)
             .opacity(stage == .gone ? 0 : 1)

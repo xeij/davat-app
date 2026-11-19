@@ -48,14 +48,14 @@ struct ProfileView: View {
         }
     }
 
-    private func strip(_ s: String, _ c: Character) -> String {
-        s.trimmingCharacters(in: .whitespaces).drop { $0 == c }.description
-    }
-
     private func save() {
         guard let id = session.userID else { return }
+        // names go out with RSVPs and chat, which hold 60 characters (Postgres counts unicode scalars)
+        let n = name.trimmingCharacters(in: .whitespaces)
+        let p = Profile(id: id, displayName: String(String.UnicodeScalarView(n.unicodeScalars.prefix(60))),
+                        venmo: PaymentLinks.clean(venmo), cashtag: PaymentLinks.clean(cashtag))
         Task {
-            do { try await session.saveProfile(Profile(id: id, displayName: name, venmo: strip(venmo, "@"), cashtag: strip(cashtag, "$"))); dismiss() }
+            do { try await session.saveProfile(p); dismiss() }
             catch { self.error = error.localizedDescription }
         }
     }

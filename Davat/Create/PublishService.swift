@@ -12,6 +12,7 @@ import SwiftUI
         var out = invite
         out.posterPath = try await backend.uploadImage(png, path: PublishPaths.poster(hostID: invite.hostID, inviteID: invite.id))
         out.updatedAt = .now
+        out.timeZone = TimeZone.current.identifier   // the web page shows the start time in the host's zone
         try await backend.saveInvite(out)
         return out
     }

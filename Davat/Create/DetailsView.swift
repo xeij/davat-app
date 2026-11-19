@@ -55,7 +55,14 @@ struct DetailsView: View {
                         get: { invite.fundraiser?.hostPays ?? false }, set: { invite.fundraiser?.hostPays = $0 }))
                 }
             } footer: {
-                if invite.fundraiser != nil { Text("the goal grows with everyone who says going.") }
+                if invite.fundraiser != nil {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("the goal grows with everyone who says going.")
+                        if session.profile.map({ $0.venmo.isEmpty && $0.cashtag.isEmpty }) ?? true {
+                            Text("add your venmo or cash app in profile so people can pay you").foregroundStyle(.tint)
+                        }
+                    }
+                }
             }
         }
         .navigationBarTitleDisplayMode(.inline)

@@ -125,7 +125,7 @@ public enum Templates {
     static let roadTrip = Design(
         background: .gradient([hex(0xFF5F6D), hex(0xFF9966), hex(0xFFC371)], angle: 200),
         layers: [
-            text("ROAD TRIP", font: "Rockwell-Bold", size: 62, color: hex(0xFFFFFF), outline: hex(0x3D1E6D),
+            text("ROAD TRIP", font: "Rockwell-Bold", size: 50, color: hex(0xFFFFFF), outline: hex(0x3D1E6D),
                  outlineWidth: 4, curve: 0.35, x: 0.5, y: 0.17),
             emoji("🚐", x: 0.5, y: 0.42, scale: 3.6),
             emoji("🌵", x: 0.12, y: 0.55, scale: 1.4),

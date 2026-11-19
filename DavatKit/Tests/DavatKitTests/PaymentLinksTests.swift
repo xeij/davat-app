@@ -36,6 +36,6 @@ import Testing
 
     @Test func inviteLink() {
         let id = UUID()
-        #expect(DavatConfig.link(for: id).absoluteString == "https://davat.vercel.app/i/\(id.uuidString.lowercased())")
+        #expect(DavatConfig.link(for: id).absoluteString == "https://davat-app-web.vercel.app/i/\(id.uuidString.lowercased())")
     }
 }

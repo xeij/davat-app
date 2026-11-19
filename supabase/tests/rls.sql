@@ -72,6 +72,10 @@ begin
   exception when insufficient_privilege then null; end;
   begin update public.responses set paid = true; assert false, 'anon updated responses';
   exception when insufficient_privilege then null; end;
+  begin delete from public.responses; assert false, 'anon deleted responses';
+  exception when insufficient_privilege then null; end;
+  begin delete from public.messages; assert false, 'anon deleted messages';
+  exception when insufficient_privilege then null; end;
 
   -- reports are write-only
   insert into public.reports (invite_id, reason) values (inv, 'spam');
@@ -99,6 +103,9 @@ begin
   update public.responses set paid = true;
   get diagnostics n = row_count;
   assert n = 0, 'non-host updated responses';
+  delete from public.messages where invite_id = inv;
+  get diagnostics n = row_count;
+  assert n = 0, 'non-host deleted messages';
 
   -- respond always targets the caller
   r := public.respond(inv, 'ignored-token-aaaaaaaa', 'U2', 'going', true);
@@ -107,6 +114,9 @@ begin
   r := public.respond(inv, null, 'U2 renamed', 'maybe', null);
   assert r.paid and r.name = 'U2 renamed' and r.rsvp = 'maybe', 'paid not preserved';
   assert (select count(*) from public.responses) = 1, 'sees only own response';
+  delete from public.responses where invite_id = inv; -- RLS also hides the others' rows from delete
+  get diagnostics n = row_count;
+  assert n = 0, 'non-host deleted responses';
   begin perform public.post_message(inv, 'U2', null, 'hello'); end;
   assert (select user_id from public.invite_messages(inv) where body = 'hello')
          = '00000000-0000-0000-0000-0000000000a2', 'post_message user_id';
@@ -119,7 +129,11 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000000a1","role":"authenticated"}', true);
 
 do $$
-declare n int;
+declare
+  inv constant uuid := '00000000-0000-0000-0000-0000000000b1';
+  n int;
+  rid uuid;
+  tok text;
 begin
   assert (select count(*) from public.responses) = 4, 'host reads responses';
   assert (select count(*) from public.invites) = 1, 'host reads invite';
@@ -135,6 +149,38 @@ begin
   exception when insufficient_privilege then null; end;
   begin perform guest_token from public.messages; assert false, 'host read message guest_token';
   exception when insufficient_privilege then null; end;
+
+  -- setPaid sends return=minimal; returning a readable column also works, guest_token does not
+  update public.responses set paid = true where name = 'A' returning id into rid;
+  assert rid is not null, 'host update returning id';
+  begin update public.responses set paid = true where name = 'A' returning guest_token into tok;
+    assert false, 'host update returned guest_token';
+  exception when insufficient_privilege then null; end;
+
+  -- moderation: the host deletes a message and a response on their invite
+  delete from public.messages where invite_id = inv and body = 'hi';
+  get diagnostics n = row_count;
+  assert n = 1, 'host deletes a message';
+  delete from public.responses where invite_id = inv and name = 'C';
+  get diagnostics n = row_count;
+  assert n = 1, 'host deletes a response';
+
+  -- an upsert that sends nulls clears the fundraiser, start time and poster
+  update public.invites set poster_path = '00000000-0000-0000-0000-0000000000a1/00000000-0000-0000-0000-0000000000b1.png',
+    starts_at = now() where id = inv;
+  insert into public.invites as t (id, host_id, title, design, starts_at, poster_path, price_cents, host_pays, time_zone)
+    values (inv, '00000000-0000-0000-0000-0000000000a1', 't', '{}', null, null, null, false, 'America/Chicago')
+    on conflict (id) do update set starts_at = excluded.starts_at, poster_path = excluded.poster_path,
+      price_cents = excluded.price_cents, host_pays = excluded.host_pays, time_zone = excluded.time_zone;
+  assert (select price_cents is null and starts_at is null and poster_path is null and time_zone = 'America/Chicago'
+          from public.invites where id = inv), 'upsert with nulls did not clear';
+
+  -- poster_path must be <uuid>/<uuid>.png in lowercase
+  begin update public.invites set poster_path = '../x.png' where id = inv; assert false, 'bad poster_path accepted';
+  exception when check_violation then null; end;
+  begin update public.invites set poster_path = upper('00000000-0000-0000-0000-0000000000a1/00000000-0000-0000-0000-0000000000b1') || '.png'
+    where id = inv; assert false, 'uppercase poster_path accepted';
+  exception when check_violation then null; end;
 end $$;
 
 rollback;

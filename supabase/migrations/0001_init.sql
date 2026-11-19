@@ -15,9 +15,10 @@ create table public.invites (
   location text not null default '',
   details text not null default '',
   design jsonb not null,
-  poster_path text,
+  poster_path text check (poster_path is null or poster_path ~ '^[0-9a-f-]{36}/[0-9a-f-]{36}\.png$'), -- <host id>/<invite id>.png
   price_cents int check (price_cents >= 0), -- null means no fundraiser
   host_pays boolean not null default false,
+  time_zone text, -- the host's IANA zone, e.g. America/Chicago, for showing starts_at
   updated_at timestamptz not null default now()
 );
 
@@ -63,7 +64,7 @@ create policy profiles_own on public.profiles for all to authenticated
   using (id = auth.uid()) with check (id = auth.uid());
 
 -- Everything is closed to anon and public by default. Guests reach data only through the functions below.
-revoke all on public.profiles, public.invites, public.messages, public.reports from anon;
+revoke all on public.profiles, public.invites, public.reports from anon;
 
 -- invites: the host reads and writes their own. Guests use get_invite(id).
 create policy invites_host_read on public.invites for select to authenticated using (host_id = auth.uid());
@@ -73,23 +74,28 @@ create policy invites_host_update on public.invites for update to authenticated
 create policy invites_host_delete on public.invites for delete to authenticated using (host_id = auth.uid());
 
 -- responses: anon has no direct access. Guests write through respond() and read through invite_public_summary().
--- Column grants: nobody reads guest_token directly and the host can edit only paid.
-revoke all on public.responses from anon;
-revoke select, update on public.responses from authenticated;
+-- Column grants: nobody reads guest_token directly and the host can edit only paid, or delete a row.
+revoke all on public.responses from anon, authenticated;
 grant select (id, invite_id, name, user_id, rsvp, paid) on public.responses to authenticated;
 grant update (paid) on public.responses to authenticated;
+grant delete on public.responses to authenticated;
 create policy responses_host_read on public.responses for select to authenticated
   using (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()));
 create policy responses_own_read on public.responses for select to authenticated using (user_id = auth.uid());
 create policy responses_host_paid on public.responses for update to authenticated
   using (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()))
   with check (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()));
+create policy responses_host_delete on public.responses for delete to authenticated
+  using (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()));
 
--- messages: no direct writes. Guests use invite_messages() and post_message(); the host also reads their invites'
--- messages directly (for realtime), without guest_token.
-revoke select, insert, update, delete on public.messages from authenticated;
+-- messages: no direct inserts or edits. Guests use invite_messages() and post_message(); the host also reads their invites'
+-- messages directly (for realtime), without guest_token, and can delete them.
+revoke all on public.messages from anon, authenticated;
 grant select (id, invite_id, name, user_id, body, created_at) on public.messages to authenticated;
+grant delete on public.messages to authenticated;
 create policy messages_host_read on public.messages for select to authenticated
+  using (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()));
+create policy messages_host_delete on public.messages for delete to authenticated
   using (exists (select 1 from public.invites i where i.id = invite_id and i.host_id = auth.uid()));
 
 -- reports: write-only for clients; read them in the dashboard

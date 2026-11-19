@@ -110,6 +110,22 @@ struct LocalBackendTests {
         #expect(!json.contains("paid"))
     }
 
+    @Test func hostDeletesResponseAndMessage() async throws {
+        let b = make()
+        let inv = UUID()
+        let r = Response(id: UUID(), inviteID: inv, name: "a", userID: nil, guestToken: "x", rsvp: .going, paid: false)
+        let m = ChatMessage(id: UUID(), inviteID: inv, name: "a", userID: nil, body: "spam", createdAt: Date())
+        try await b.respond(r)
+        try await b.send(m)
+        var it = b.changes(inviteID: inv).makeAsyncIterator()
+        try await b.deleteResponse(id: r.id)
+        #expect(await it.next() != nil)
+        try await b.deleteMessage(id: m.id)
+        #expect(try await b.responses(inviteID: inv).isEmpty)
+        #expect(try await b.messages(inviteID: inv).isEmpty)
+        try await b.deleteMessage(id: m.id)   // already gone is fine
+    }
+
     @Test func inviteByID() async throws {
         let b = make()
         let i = invite()

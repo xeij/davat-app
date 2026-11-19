@@ -1,7 +1,8 @@
 import DavatKit
 import SwiftUI
 
-/// The invite's chat, for the host. Guests chat on the web page and in the iMessage extension.
+/// The invite's chat, for the host. Guests chat on the web page; the iMessage card links there.
+/// Long-press a message to delete it.
 struct ChatView: View {
     let invite: Invite
     @Environment(Session.self) private var session
@@ -13,7 +14,7 @@ struct ChatView: View {
     @State private var sent = 0
 
     private var trimmed: String { draft.trimmingCharacters(in: .whitespacesAndNewlines) }
-    private var canSend: Bool { !sending && (1...1000).contains(trimmed.count) }
+    private var canSend: Bool { !sending && (1...1000).contains(trimmed.unicodeScalars.count) }   // what Postgres counts
 
     var body: some View {
         NavigationStack {
@@ -72,6 +73,14 @@ struct ChatView: View {
                 .glassEffect(mine ? .regular.tint(.saffron.opacity(0.35)) : .regular, in: .rect(cornerRadius: 18))
         }
         .frame(maxWidth: .infinity, alignment: mine ? .trailing : .leading)
+        .contextMenu {
+            Button("Delete", systemImage: "trash", role: .destructive) { Task { await delete(m) } }
+        }
+    }
+
+    private func delete(_ m: ChatMessage) async {
+        do { try await session.backend.deleteMessage(id: m.id); await reload() }
+        catch { self.error = "couldn't delete: \(error.localizedDescription)" }
     }
 
     private func reload() async {

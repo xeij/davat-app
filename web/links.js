@@ -1,9 +1,7 @@
 // Port of DavatKit/Sources/DavatKit/PaymentLinks.swift. Keep the two in step.
 
-const strip = (s, prefix) => {
-  const t = s.trim();
-  return t.startsWith(prefix) ? t.slice(1) : t;
-};
+// Keeps only what a handle can hold, [A-Za-z0-9_-]: drops "@", "$" and anything that could change the link.
+const clean = (s) => (s ?? "").replace(/[^A-Za-z0-9_-]/g, "");
 
 // "20.50" for 2050
 const decimal = (cents) => `${Math.trunc(cents / 100)}.${String(cents % 100).padStart(2, "0")}`;
@@ -18,13 +16,13 @@ const encodeNote = (s) => {
 };
 
 export function venmo(handle, cents, note) {
-  const h = strip(handle ?? "", "@");
+  const h = clean(handle);
   if (!h) return null;
   return `https://venmo.com/u/${h}?txn=pay&amount=${decimal(cents)}&note=${encodeNote(note)}`;
 }
 
 export function cashApp(tag, cents) {
-  const t = strip(tag ?? "", "$");
+  const t = clean(tag);
   if (!t) return null;
   return `https://cash.app/$${t}/${decimal(cents)}`;
 }

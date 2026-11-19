@@ -57,10 +57,9 @@ final class MessagesViewController: MSMessagesAppViewController {
 
     /// A ~480px-tall poster for the compact row, decoded straight to that size. Only these are cached.
     func thumbnail(_ invite: Invite) async -> UIImage? {
-        guard let path = invite.posterPath else { return nil }
-        let key = "\(path)@\(invite.updatedAt.timeIntervalSince1970)"   // a republish keeps the path, so key on the version too
+        guard let url = posterURL(invite) else { return nil }
+        let key = url.absoluteString   // carries the version, since a republish keeps the path
         if let t = thumbs[key] { return t }
-        guard let url = backend.imageURL(path: path) else { return nil }
         let src: CGImageSource? = if url.isFileURL {
             CGImageSourceCreateWithURL(url as CFURL, nil)
         } else {
@@ -75,9 +74,16 @@ final class MessagesViewController: MSMessagesAppViewController {
 
     /// The full published PNG: a file for LocalBackend, a download otherwise. Not cached.
     func poster(_ invite: Invite) async -> UIImage? {
-        guard let path = invite.posterPath, let url = backend.imageURL(path: path) else { return nil }
+        guard let url = posterURL(invite) else { return nil }
         let data = url.isFileURL ? try? Data(contentsOf: url) : try? await URLSession.shared.data(from: url).0
         return data.flatMap(UIImage.init(data:))
+    }
+
+    /// A republish overwrites the same file, and storage serves it with an hour of caching, so ask for this version.
+    private func posterURL(_ invite: Invite) -> URL? {
+        guard let path = invite.posterPath, let url = backend.imageURL(path: path) else { return nil }
+        if url.isFileURL { return url }
+        return url.appending(queryItems: [URLQueryItem(name: "v", value: String(Int(invite.updatedAt.timeIntervalSince1970)))])
     }
 
     /// Inserts a new bubble for the invite into the compose field.

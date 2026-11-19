@@ -31,4 +31,22 @@ import Testing
         #expect(d.layers.count == 1)
         #expect(d.layers[0].kind == .emoji("x"))
     }
+
+    @Test func inviteRowWritesNulls() throws {
+        let i = Invite(id: UUID(), hostID: UUID(), title: "t", design: Design(background: .color(RGBA(r: 1, g: 1, b: 1))),
+                       updatedAt: Date(), timeZone: "America/Chicago")
+        let json = String(decoding: try JSONEncoder().encode(SupabaseBackend.InviteRow(i)), as: UTF8.self)
+        for key in ["price_cents", "starts_at", "poster_path"] { #expect(json.contains("\"\(key)\":null")) }
+        #expect(json.contains("\"host_pays\":false"))
+        #expect(json.contains(#""time_zone":"America\/Chicago""#))
+    }
+
+    @Test func inviteDecodesWithoutTimeZone() throws {
+        let i = Invite(id: UUID(), hostID: UUID(), title: "t", design: Design(background: .color(RGBA(r: 1, g: 1, b: 1))),
+                       updatedAt: Date(timeIntervalSince1970: 0))
+        var obj = try JSONSerialization.jsonObject(with: JSONEncoder().encode(i)) as! [String: Any]
+        obj["timeZone"] = nil
+        let back = try JSONDecoder().decode(Invite.self, from: JSONSerialization.data(withJSONObject: obj))
+        #expect(back == i && back.timeZone == nil)
+    }
 }

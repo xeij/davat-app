@@ -153,6 +153,15 @@ struct InviteDetailView: View {
                             await reload()
                         }
                     }
+                    .contextMenu {   // moderation: long-press to remove a guest's answer
+                        Button("Remove", systemImage: "trash", role: .destructive) {
+                            Task {
+                                do { try await session.backend.deleteResponse(id: r.id) }
+                                catch { self.error = error.localizedDescription }
+                                await reload()
+                            }
+                        }
+                    }
                 }
             }
         }

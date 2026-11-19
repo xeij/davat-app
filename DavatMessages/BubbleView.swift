@@ -92,6 +92,7 @@ struct GuestView: View {
     @State private var busy = false
     @State private var error: String?
     @State private var answered = 0
+    @State private var paid = false
     @AppStorage("guestName") private var guestName = ""
     @AppStorage("guestToken") private var guestToken = ""
 
@@ -110,6 +111,12 @@ struct GuestView: View {
                     if name.isEmpty { namePrompt }
                     rsvpButtons(invite)
                     if let f = invite.fundraiser, let summary { fundraiser(invite, f, summary) }
+                    Button { model.open(DavatConfig.link(for: invite.id)) } label: {
+                        Label("chat", systemImage: "bubble.left.and.bubble.right").frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.glass).controlSize(.large)
+                    Button("report this invite") { model.open(Self.reportLink(invite.id)) }
+                        .font(.footnote).foregroundStyle(.secondary).buttonStyle(.plain)
                 }
                 if let error {
                     Label(error, systemImage: "exclamationmark.triangle").font(.footnote).foregroundStyle(.secondary)
@@ -188,11 +195,11 @@ struct GuestView: View {
                             Button { model.open(url) } label: { Text("Cash App").frame(maxWidth: .infinity) }.buttonStyle(.glass)
                         }
                     }
-                    Button { Task { await answer(mine ?? .going, paid: true) } } label: {
-                        Text("I paid").frame(maxWidth: .infinity)
+                    Button { Task { await answer(.going, paid: true) } } label: {   // paying counts only when going
+                        Text(paid ? "marked as going and paid" : "I paid").frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.glassProminent)
-                    .disabled(name.isEmpty || busy)
+                    .disabled(name.isEmpty || busy || paid)
                 }
                 .controlSize(.large)
             }
@@ -205,7 +212,12 @@ struct GuestView: View {
 
     private func saveName() {
         let n = draft.trimmingCharacters(in: .whitespaces)
-        if !n.isEmpty { guestName = n }
+        if !n.isEmpty { guestName = String(String.UnicodeScalarView(n.unicodeScalars.prefix(60))) }   // the database holds 60
+    }
+
+    /// The web page opens its report form on #report.
+    static func reportLink(_ id: UUID) -> URL {
+        URL(string: DavatConfig.link(for: id).absoluteString + "#report")!
     }
 
     private func load() async {
@@ -235,13 +247,17 @@ struct GuestView: View {
                 id: UUID(), inviteID: invite.id, name: name, userID: model.userID,
                 guestToken: model.userID == nil ? guestToken : nil, rsvp: rsvp, paid: paid))
             mine = rsvp
+            if paid { self.paid = true }
             answered += 1
             UserDefaults.standard.set(rsvp.rawValue, forKey: mineKey)
             let s = try await model.backend.summary(inviteID: invite.id)
             summary = s
             error = nil
-            try await model.update(invite, caption: BubbleCaption.make(name: name, rsvp: rsvp, summary: s,
-                                                                         fundraiser: invite.fundraiser))
+            // Only RSVPs update the bubble; a paid tap would tell the whole thread who paid.
+            if !paid {
+                try await model.update(invite, caption: BubbleCaption.make(name: name, rsvp: rsvp, summary: s,
+                                                                             fundraiser: invite.fundraiser))
+            }
         } catch {
             self.error = error.localizedDescription
         }

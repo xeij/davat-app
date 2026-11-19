@@ -19,11 +19,20 @@ function config() {
   return { url: process.env.SUPABASE_URL || c.supabaseURL || "", key: process.env.SUPABASE_ANON_KEY || c.supabaseAnonKey || "" };
 }
 
-// ponytail: invites carry no time zone, so previews use US Eastern. Store the host's zone on the invite to fix.
-const dateLine = (iso) =>
-  new Intl.DateTimeFormat("en-US", {
-    weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York",
-  }).format(new Date(iso)).toLowerCase();   // the app's voice, same as the date line on the page
+// In the host's zone, lowercase like the page. Invites without a zone (or an unknown one) show the UTC date only.
+function dateLine(iso, zone) {
+  const opts = { weekday: "short", month: "short", day: "numeric" };
+  try {
+    if (zone) return new Intl.DateTimeFormat("en-US", { ...opts, hour: "numeric", minute: "2-digit", timeZone: zone }).format(new Date(iso)).toLowerCase();
+  } catch {}
+  return new Intl.DateTimeFormat("en-US", { ...opts, timeZone: "UTC" }).format(new Date(iso)).toLowerCase();
+}
+
+// ?v= changes on every republish, which overwrites the same file, so previews don't show a cached old poster.
+function posterURL(url, invite) {
+  const v = Date.parse(invite.updated_at);
+  return `${url}/storage/v1/object/public/posters/${encodeURI(invite.poster_path)}${Number.isFinite(v) ? `?v=${Math.floor(v / 1000)}` : ""}`;
+}
 
 const GONE = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>davat</title>
@@ -66,9 +75,9 @@ module.exports = async function handler(req, res) {
   const tags = [
     `<title>${esc(invite.title || "davat")}</title>`,
     `<meta property="og:title" content="${esc(invite.title || "you're invited")}">`,
-    `<meta property="og:description" content="${esc(invite.starts_at ? dateLine(invite.starts_at) : "you're invited")}">`,
+    `<meta property="og:description" content="${esc(invite.starts_at ? dateLine(invite.starts_at, invite.time_zone) : "you're invited")}">`,
     invite.poster_path &&
-      `<meta property="og:image" content="${esc(`${url}/storage/v1/object/public/posters/${encodeURI(invite.poster_path)}`)}">`,
+      `<meta property="og:image" content="${esc(posterURL(url, invite))}">`,
     `<meta name="twitter:card" content="summary_large_image">`,
     `<!-- TODO: replace app-id=0 with the App Store id once Davat is listed -->`,
     `<meta name="apple-itunes-app" content="app-id=0, app-argument=${esc(link)}">`,

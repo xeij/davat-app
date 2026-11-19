@@ -22,8 +22,10 @@ public protocol Backend: Sendable {
     /// only the host unmarks, through setPaid. The stored row may keep its own id, so re-fetch after.
     func respond(_ r: Response) async throws
     func setPaid(responseID: UUID, paid: Bool) async throws
+    func deleteResponse(id: UUID) async throws   // host moderation
     func messages(inviteID: UUID) async throws -> [ChatMessage]
     func send(_ m: ChatMessage) async throws
+    func deleteMessage(id: UUID) async throws    // host moderation
     func changes(inviteID: UUID) -> AsyncStream<Void>   // fires when responses or messages change
 }
 
@@ -172,6 +174,14 @@ public final class LocalBackend: Backend, @unchecked Sendable {
             notify(all[n].inviteID)
         }
     }
+    public func deleteResponse(id: UUID) async throws {
+        try lock.withLock {
+            let all = load("responses", [Response].self) ?? []
+            guard let gone = all.first(where: { $0.id == id }) else { return }
+            try store("responses", all.filter { $0.id != id })
+            notify(gone.inviteID)
+        }
+    }
 
     public func messages(inviteID: UUID) async throws -> [ChatMessage] {
         lock.withLock { (load("messages", [ChatMessage].self) ?? []).filter { $0.inviteID == inviteID }.sorted { $0.createdAt < $1.createdAt } }
@@ -180,6 +190,14 @@ public final class LocalBackend: Backend, @unchecked Sendable {
         try lock.withLock {
             try store("messages", (load("messages", [ChatMessage].self) ?? []) + [m])
             notify(m.inviteID)
+        }
+    }
+    public func deleteMessage(id: UUID) async throws {
+        try lock.withLock {
+            let all = load("messages", [ChatMessage].self) ?? []
+            guard let gone = all.first(where: { $0.id == id }) else { return }
+            try store("messages", all.filter { $0.id != id })
+            notify(gone.inviteID)
         }
     }
 

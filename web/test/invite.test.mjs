@@ -20,7 +20,8 @@ async function call(id, rows) {
 
 test("injects escaped preview tags", async () => {
   const { res, seen } = await call(ID, [
-    { title: `<script>"x" & 'y'</script>`, starts_at: "2026-12-06T01:00:00Z", poster_path: "u/p.png" },
+    { title: `<script>"x" & 'y'</script>`, starts_at: "2026-12-06T01:00:00Z", time_zone: "America/New_York",
+      poster_path: "u/p.png", updated_at: "2026-11-19T10:00:00.5+00:00" },
   ]);
   assert.equal(res.statusCode, 200);
   assert.equal(seen[0].url, "https://x.supabase.co/rest/v1/rpc/get_invite");
@@ -28,9 +29,16 @@ test("injects escaped preview tags", async () => {
   assert.match(res.body, /<meta property="og:title" content="&lt;script&gt;&quot;x&quot; &amp; &#39;y&#39;&lt;\/script&gt;">/);
   assert.ok(!res.body.includes(`<script>"x"`));
   assert.match(res.body, /og:description" content="sat, dec 5, 8:00 pm"/);
-  assert.match(res.body, /og:image" content="https:\/\/x\.supabase\.co\/storage\/v1\/object\/public\/posters\/u\/p\.png"/);
+  assert.match(res.body, /og:image" content="https:\/\/x\.supabase\.co\/storage\/v1\/object\/public\/posters\/u\/p\.png\?v=1795082400"/);
   assert.match(res.body, /app-argument=https:\/\/davat\.vercel\.app\/i\/0b6a3c6e/);
   assert.match(res.body, /twitter:card" content="summary_large_image"/);
+});
+
+test("dates follow the host's zone, else the UTC date only", async () => {
+  const at = "2026-12-06T01:00:00Z";
+  assert.match((await call(ID, [{ title: "t", starts_at: at, time_zone: "America/Los_Angeles" }])).res.body, /content="sat, dec 5, 5:00 pm"/);
+  assert.match((await call(ID, [{ title: "t", starts_at: at, time_zone: null }])).res.body, /content="sun, dec 6"/);
+  assert.match((await call(ID, [{ title: "t", starts_at: at, time_zone: "Not/AZone" }])).res.body, /content="sun, dec 6"/);
 });
 
 test("missing date says you're invited", async () => {

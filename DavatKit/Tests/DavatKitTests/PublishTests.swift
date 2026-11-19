@@ -31,3 +31,15 @@ import Testing
     try await b.respond(r)
     #expect(try await b.responses(inviteID: invite).first?.paid == true)
 }
+
+@Test func defaultStartIsComingSaturdayAtSeven() {
+    var cal = Calendar(identifier: .gregorian)
+    cal.timeZone = TimeZone(identifier: "America/Los_Angeles")!
+    func d(_ s: String) -> Date {   // local wall time in LA
+        let f = DateFormatter(); f.calendar = cal; f.timeZone = cal.timeZone; f.dateFormat = "yyyy-MM-dd HH:mm"
+        return f.date(from: s)!
+    }
+    #expect(Invite.defaultStart(after: d("2026-11-19 10:00"), calendar: cal) == d("2026-11-21 19:00"))  // thursday
+    #expect(Invite.defaultStart(after: d("2026-11-21 18:59"), calendar: cal) == d("2026-11-21 19:00"))  // saturday, before
+    #expect(Invite.defaultStart(after: d("2026-11-21 19:30"), calendar: cal) == d("2026-11-28 19:00"))  // saturday, after
+}

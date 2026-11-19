@@ -17,3 +17,12 @@ public enum GuestGroups {
         }
     }
 }
+
+extension Invite {
+    /// The start time a new invite suggests: the coming Saturday at 7pm, or today at 7pm if today is
+    /// Saturday and it's not 7pm yet.
+    public static func defaultStart(after now: Date, calendar: Calendar = .current) -> Date {
+        calendar.nextDate(after: now, matching: DateComponents(hour: 19, minute: 0, second: 0, weekday: 7),
+                          matchingPolicy: .nextTime) ?? now
+    }
+}

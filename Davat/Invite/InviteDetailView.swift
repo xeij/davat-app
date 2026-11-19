@@ -12,6 +12,7 @@ struct InviteDetailView: View {
     @State private var editing: EditStep?
     @State private var confirmDelete = false
     @State private var error: String?
+    @State private var loadError: String?
 
     enum EditStep: Identifiable { case design, details; var id: Self { self } }
 
@@ -33,9 +34,12 @@ struct InviteDetailView: View {
                           preview: SharePreview(invite.title, image: poster ?? Image(systemName: "envelope"))) {
                     Label("Share", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.glass).controlSize(.large)
+                .buttonStyle(.glassProminent).controlSize(.large)
                 if let f = invite.fundraiser { fundraiserCard(f) }
                 guests
+                if let loadError {
+                    Label(loadError, systemImage: "exclamationmark.triangle").font(.footnote).foregroundStyle(.secondary)
+                }
                 #if DEBUG
                 if session.backend is LocalBackend {
                     Button("simulate guests") { Task { await simulateGuests() } }.buttonStyle(.glass)
@@ -45,6 +49,7 @@ struct InviteDetailView: View {
             .padding(20)
         }
         .navigationBarTitleDisplayMode(.inline)
+        .tint(.saffron)
         .toolbar {
             Menu("More", systemImage: "ellipsis") {
                 Button("Edit design", systemImage: "paintbrush") { editing = .design }
@@ -60,7 +65,7 @@ struct InviteDetailView: View {
         }
         .alert("that didn't work", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
         } message: { Text(error ?? "") }
-        .task(id: invite.id) {
+        .task(id: invite.updatedAt) {   // re-keyed after an edit, so the totals follow a new price
             await reload()
             for await _ in session.backend.changes(inviteID: invite.id) { await reload() }
         }
@@ -73,7 +78,7 @@ struct InviteDetailView: View {
         }
         #endif
         .task(id: invite.updatedAt) {
-            poster = await PublishService.poster(invite.design, images: session.images).map(Image.init(uiImage:))
+            poster = await PublishService.poster(invite.design, images: session.images, scale: 0.3).map(Image.init(uiImage:))
         }
     }
 
@@ -123,8 +128,13 @@ struct InviteDetailView: View {
     }
 
     private func reload() async {
-        if let r = try? await session.backend.responses(inviteID: invite.id) { responses = r }
-        if let s = try? await session.backend.summary(inviteID: invite.id) { summary = s }
+        do {
+            responses = try await session.backend.responses(inviteID: invite.id)
+            summary = try await session.backend.summary(inviteID: invite.id)
+            loadError = nil
+        } catch {
+            loadError = "couldn't refresh: \(error.localizedDescription)"
+        }
     }
 
     private func delete() {

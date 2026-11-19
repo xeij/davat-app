@@ -58,6 +58,7 @@ struct DetailsView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .tint(.saffron)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 if publishing { ProgressView() } else {
@@ -66,10 +67,7 @@ struct DetailsView: View {
             }
         }
         .onAppear {
-            // next whole hour, so the picker and the saved invite agree
-            if invite.startsAt == nil {
-                invite.startsAt = Calendar.current.nextDate(after: .now, matching: DateComponents(minute: 0), matchingPolicy: .nextTime)
-            }
+            if invite.startsAt == nil { invite.startsAt = Invite.defaultStart(after: .now) }
         }
         .alert("couldn't publish", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
         } message: { Text(error ?? "") }

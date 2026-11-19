@@ -6,7 +6,32 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
     private let client: SupabaseClient
 
     public init(url: URL, anonKey: String) {
-        client = SupabaseClient(supabaseURL: url, supabaseKey: anonKey)
+        client = SupabaseClient(supabaseURL: url, supabaseKey: anonKey, options: .init(auth: .init(storage: SharedStorage())))
+    }
+
+    /// Keeps the session in the shared keychain group so the iMessage extension shares the app's login.
+    /// Info.plist carries `AppIdentifierPrefix`; unsigned builds have none, or the keychain refuses the
+    /// group, and then the app's own keychain is used instead.
+    private struct SharedStorage: AuthLocalStorage {
+        let shared: KeychainLocalStorage? = {
+            guard let prefix = Bundle.main.infoDictionary?["AppIdentifierPrefix"] as? String,
+                  !prefix.isEmpty, !prefix.hasPrefix("$(") else { return nil }
+            return KeychainLocalStorage(accessGroup: prefix + "com.davat.shared")
+        }()
+        let local = KeychainLocalStorage()
+
+        func store(key: String, value: Data) throws {
+            if let shared, (try? shared.store(key: key, value: value)) != nil { return }
+            try local.store(key: key, value: value)
+        }
+        func retrieve(key: String) throws -> Data? {
+            if let d = try? shared?.retrieve(key: key) { return d }
+            return try local.retrieve(key: key)
+        }
+        func remove(key: String) throws {   // deleting a missing item throws, so both are best effort
+            try? shared?.remove(key: key)
+            try? local.remove(key: key)
+        }
     }
 
     private struct ProfileRow: Codable {

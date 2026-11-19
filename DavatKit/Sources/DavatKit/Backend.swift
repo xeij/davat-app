@@ -52,6 +52,8 @@ public final class LocalBackend: Backend, @unchecked Sendable {
     private let encoder: JSONEncoder = { let e = JSONEncoder(); e.dateEncodingStrategy = .iso8601; return e }()
     private let decoder: JSONDecoder = { let d = JSONDecoder(); d.dateDecodingStrategy = .iso8601; return d }()
 
+    /// Defaults to the App Group container, shared with the iMessage extension. Builds without the
+    /// entitlement (unsigned simulator builds) fall back to this process's Application Support.
     public init(directory: URL? = nil) {
         let base = directory
             ?? FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.davat.app")

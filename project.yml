@@ -18,10 +18,12 @@ targets:
     sources: [Davat]
     dependencies:
       - package: DavatKit
+      - target: DavatMessages
     entitlements:
       path: Davat/Davat.entitlements
       properties:
         com.apple.security.application-groups: [group.com.davat.app]
+        keychain-access-groups: ["$(AppIdentifierPrefix)com.davat.shared"]
         com.apple.developer.applesignin: [Default]
         com.apple.developer.associated-domains: ["applinks:davat.vercel.app"]
     info:
@@ -31,6 +33,7 @@ targets:
         UILaunchScreen: {}
         SupabaseURL: ""
         SupabaseAnonKey: ""
+        AppIdentifierPrefix: $(AppIdentifierPrefix)
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
     settings:
       base:
@@ -38,6 +41,31 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  DavatMessages:
+    type: app-extension.messages
+    platform: iOS
+    sources: [DavatMessages]
+    dependencies:
+      - package: DavatKit
+    entitlements:
+      path: DavatMessages/DavatMessages.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.davat.app]
+        keychain-access-groups: ["$(AppIdentifierPrefix)com.davat.shared"]
+    info:
+      path: DavatMessages/Info.plist
+      properties:
+        CFBundleDisplayName: davat
+        SupabaseURL: ""
+        SupabaseAnonKey: ""
+        AppIdentifierPrefix: $(AppIdentifierPrefix)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.message-payload-provider
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).MessagesViewController
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davat.app.messages
+        TARGETED_DEVICE_FAMILY: "1"
   DavatUITests:
     type: bundle.ui-testing
     platform: iOS

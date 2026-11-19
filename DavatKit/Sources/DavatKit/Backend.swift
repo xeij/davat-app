@@ -52,12 +52,21 @@ public final class LocalBackend: Backend, @unchecked Sendable {
     private let encoder: JSONEncoder = { let e = JSONEncoder(); e.dateEncodingStrategy = .iso8601; return e }()
     private let decoder: JSONDecoder = { let d = JSONDecoder(); d.dateDecodingStrategy = .iso8601; return d }()
 
+    /// Defaults to the App Group container, shared with the iMessage extension. Builds without the
+    /// entitlement (unsigned simulator builds) fall back to this process's Application Support.
     public init(directory: URL? = nil) {
-        let base = directory
-            ?? FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.davat.app")
-            ?? URL.applicationSupportDirectory
-        dir = base.appending(path: "local", directoryHint: .isDirectory)
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        let fm = FileManager.default
+        let own = URL.applicationSupportDirectory.appending(path: "local", directoryHint: .isDirectory)
+        if let directory {
+            dir = directory.appending(path: "local", directoryHint: .isDirectory)
+        } else if let group = fm.containerURL(forSecurityApplicationGroupIdentifier: "group.com.davat.app") {
+            dir = group.appending(path: "local", directoryHint: .isDirectory)
+            // Data written before the App Group was available moves over once.
+            if fm.fileExists(atPath: own.path), !fm.fileExists(atPath: dir.path) { try? fm.moveItem(at: own, to: dir) }
+        } else {
+            dir = own
+        }
+        try? fm.createDirectory(at: dir, withIntermediateDirectories: true)
     }
 
     private func load<T: Decodable>(_ name: String, _ type: T.Type) -> T? {

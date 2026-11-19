@@ -160,12 +160,11 @@ struct GuestView: View {
         GlassEffectContainer {
             HStack(spacing: 10) {
                 ForEach(RSVP.allCases, id: \.self) { r in
-                    Button { Task { await answer(r, paid: false) } } label: {
-                        Text(label(r)).frame(maxWidth: .infinity)
+                    let b = Button { Task { await answer(r, paid: false) } } label: {
+                        Text(label(r)).lineLimit(1).frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.glass)
-                    .tint(mine == r ? saffron : nil)
                     .controlSize(.large)
+                    if mine == r { b.buttonStyle(.glassProminent) } else { b.buttonStyle(.glass) }
                 }
             }
         }
@@ -178,12 +177,14 @@ struct GuestView: View {
                 .font(.title3.weight(.light))
             ProgressView(value: s.goalCents == 0 ? 0 : min(1, Double(s.raisedCents) / Double(s.goalCents)))
             GlassEffectContainer {
-                HStack(spacing: 10) {
-                    if let url = PaymentLinks.venmo(handle: s.hostVenmo, cents: f.priceCents, note: invite.title) {
-                        Button { model.open(url) } label: { Text("Venmo").frame(maxWidth: .infinity) }.buttonStyle(.glass)
-                    }
-                    if let url = PaymentLinks.cashApp(tag: s.hostCashtag, cents: f.priceCents) {
-                        Button { model.open(url) } label: { Text("Cash App").frame(maxWidth: .infinity) }.buttonStyle(.glass)
+                VStack(spacing: 10) {
+                    HStack(spacing: 10) {
+                        if let url = PaymentLinks.venmo(handle: s.hostVenmo, cents: f.priceCents, note: invite.title) {
+                            Button { model.open(url) } label: { Text("Venmo").frame(maxWidth: .infinity) }.buttonStyle(.glass)
+                        }
+                        if let url = PaymentLinks.cashApp(tag: s.hostCashtag, cents: f.priceCents) {
+                            Button { model.open(url) } label: { Text("Cash App").frame(maxWidth: .infinity) }.buttonStyle(.glass)
+                        }
                     }
                     Button { Task { await answer(mine ?? .going, paid: true) } } label: {
                         Text("I paid").frame(maxWidth: .infinity)

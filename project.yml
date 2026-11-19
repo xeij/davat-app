@@ -23,6 +23,7 @@ targets:
       path: Davat/Davat.entitlements
       properties:
         com.apple.security.application-groups: [group.com.davat.app]
+        keychain-access-groups: ["$(AppIdentifierPrefix)com.davat.shared"]
         com.apple.developer.applesignin: [Default]
         com.apple.developer.associated-domains: ["applinks:davat.vercel.app"]
     info:
@@ -32,6 +33,7 @@ targets:
         UILaunchScreen: {}
         SupabaseURL: ""
         SupabaseAnonKey: ""
+        AppIdentifierPrefix: $(AppIdentifierPrefix)
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
     settings:
       base:
@@ -49,12 +51,14 @@ targets:
       path: DavatMessages/DavatMessages.entitlements
       properties:
         com.apple.security.application-groups: [group.com.davat.app]
+        keychain-access-groups: ["$(AppIdentifierPrefix)com.davat.shared"]
     info:
       path: DavatMessages/Info.plist
       properties:
         CFBundleDisplayName: davat
         SupabaseURL: ""
         SupabaseAnonKey: ""
+        AppIdentifierPrefix: $(AppIdentifierPrefix)
         NSExtension:
           NSExtensionPointIdentifier: com.apple.message-payload-provider
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).MessagesViewController

@@ -236,7 +236,7 @@ $("#report-form").onsubmit = async (e) => {
 // --- effects: canvas particles over the poster, same names as Effect in Design.swift
 
 function startEffect(kind) {
-  if (!["confetti", "snow", "sparkle", "hearts"].includes(kind) || reducedMotion) return;
+  if (!["confetti", "snow", "sparkle", "hearts", "bubbles", "petals"].includes(kind) || reducedMotion) return;
   const canvas = $("#fx");
   const ctx = canvas.getContext("2d");
   let w, h;
@@ -252,16 +252,17 @@ function startEffect(kind) {
   addEventListener("resize", size);
 
   const rand = (a, b) => a + Math.random() * (b - a);
-  const colors = { confetti: ["#D9922E", "#F2C14E", "#E8576B", "#5BC0BE", "#FFFFFF"], hearts: ["#E8576B", "#FF8FA3", "#D9922E"] }[kind];
+  const colors = { confetti: ["#D9922E", "#F2C14E", "#E8576B", "#5BC0BE", "#FFFFFF"], hearts: ["#E8576B", "#FF8FA3", "#D9922E"],
+    bubbles: ["rgba(255,255,255,.8)", "rgba(255,255,255,.5)"], petals: ["#FFC7D9", "#FAA6BF", "#CCB3F2"] }[kind];
   const spawn = (p, anywhere) => Object.assign(p, {
     x: rand(0, w),
-    y: anywhere || kind === "sparkle" ? rand(0, h) : kind === "hearts" ? h + 20 : -20,
-    vy: { confetti: rand(1.2, 2.8), snow: rand(0.4, 1.2), sparkle: 0, hearts: -rand(0.5, 1.2) }[kind],
-    r: { confetti: rand(4, 7), snow: rand(1.5, 4), sparkle: rand(3, 7), hearts: rand(10, 18) }[kind],
+    y: anywhere || kind === "sparkle" ? rand(0, h) : kind === "hearts" || kind === "bubbles" ? h + 20 : -20,
+    vy: { confetti: rand(1.2, 2.8), snow: rand(0.4, 1.2), sparkle: 0, hearts: -rand(0.5, 1.2), bubbles: -rand(0.5, 1.2), petals: rand(0.4, 0.9) }[kind],
+    r: { confetti: rand(4, 7), snow: rand(1.5, 4), sparkle: rand(3, 7), hearts: rand(10, 18), bubbles: rand(4, 13), petals: rand(4, 7) }[kind],
     a: rand(0, 6.28), t: rand(0, 6.28), sway: rand(0.02, 0.05),
     c: colors ? colors[Math.floor(Math.random() * colors.length)] : "#fff",
   });
-  const n = { confetti: 70, snow: 80, sparkle: 36, hearts: 22 }[kind];
+  const n = { confetti: 70, snow: 80, sparkle: 36, hearts: 22, bubbles: 32, petals: 40 }[kind];
   const ps = Array.from({ length: n }, () => spawn({}, true));
 
   const heart = (s) => {
@@ -287,7 +288,7 @@ function startEffect(kind) {
     for (const p of ps) {
       p.t += p.sway;
       p.y += p.vy;
-      p.x += Math.sin(p.t) * (kind === "confetti" ? 0.8 : 0.4);
+      p.x += Math.sin(p.t) * (kind === "confetti" || kind === "petals" ? 0.8 : 0.4);
       p.a += 0.05;
       if (p.y > h + 30 || p.y < -30) spawn(p, false);
       ctx.save();
@@ -306,6 +307,18 @@ function startEffect(kind) {
         ctx.globalAlpha = Math.max(0, Math.sin(p.t * 2));
         if (ctx.globalAlpha === 0 && Math.random() < 0.02) spawn(p, true);
         star(p.r);
+      } else if (kind === "bubbles") {
+        ctx.strokeStyle = p.c;
+        ctx.lineWidth = Math.max(1, p.r * 0.24);
+        ctx.beginPath();
+        ctx.arc(0, 0, p.r, 0, 6.28);
+        ctx.stroke();
+      } else if (kind === "petals") {
+        ctx.rotate(p.a);
+        ctx.scale(Math.cos(p.t * 1.7), 1);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.r, p.r * 0.6, 0, 0, 6.28);
+        ctx.fill();
       } else {
         ctx.globalAlpha = 0.9;
         heart(p.r);
@@ -382,7 +395,7 @@ async function start() {
 
   paint();
   if (invite.design?.envelope) envelope(invite.title);
-  startEffect(invite.design?.effect);
+  startEffect((demo && params.get("effect")) || invite.design?.effect);
   schedule();
   document.addEventListener("visibilitychange", schedule);
 }

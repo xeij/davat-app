@@ -77,11 +77,15 @@ struct HomeView: View {
         #if DEBUG
         let args = ProcessInfo.processInfo.arguments
         if args.contains("-demoSeed"), invites.isEmpty {
-            for (i, t) in Templates.all.prefix(2).enumerated() {
+            // -demoTemplate "<name>" seeds that template first, for screenshots
+            let pick = args.firstIndex(of: "-demoTemplate").flatMap { args.indices.contains($0 + 1) ? args[$0 + 1] : nil }
+            let named = Templates.all.filter { $0.name == pick }
+            let seeds = named.isEmpty ? Array(Templates.all.prefix(2)) : named
+            for t in seeds {
                 try? await session.backend.saveInvite(Invite(
-                    id: UUID(), hostID: session.userID ?? UUID(), title: t.name, startsAt: .now.addingTimeInterval(86400 * 9),
-                    location: "the rooftop on 5th", details: "bring a friend and your best moves",
-                    design: t.design, fundraiser: i == 0 ? Fundraiser(priceCents: 2000, hostPays: true) : nil, updatedAt: .now))
+                    id: UUID(), hostID: session.userID ?? UUID(), title: t.name, startsAt: Invite.defaultStart(after: .now),
+                    location: "our place", details: "bring a friend",
+                    design: t.design, fundraiser: t.name == seeds.first?.name ? Fundraiser(priceCents: 2000, hostPays: true) : nil, updatedAt: .now))
             }
             invites = (try? await session.backend.myInvites()) ?? []
         }

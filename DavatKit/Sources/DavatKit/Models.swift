@@ -11,12 +11,15 @@ public struct Invite: Codable, Identifiable, Hashable, Sendable {
     public var posterPath: String?
     public var fundraiser: Fundraiser?
     public var updatedAt: Date
+    /// The host's IANA zone when last saved, so the web page shows starts_at in the host's time. Missing in older data.
+    public var timeZone: String?
 
     public init(id: UUID, hostID: UUID, title: String, startsAt: Date? = nil, location: String = "", details: String = "",
-                design: Design, posterPath: String? = nil, fundraiser: Fundraiser? = nil, updatedAt: Date) {
+                design: Design, posterPath: String? = nil, fundraiser: Fundraiser? = nil, updatedAt: Date,
+                timeZone: String? = nil) {
         self.id = id; self.hostID = hostID; self.title = title; self.startsAt = startsAt
         self.location = location; self.details = details; self.design = design
-        self.posterPath = posterPath; self.fundraiser = fundraiser; self.updatedAt = updatedAt
+        self.posterPath = posterPath; self.fundraiser = fundraiser; self.updatedAt = updatedAt; self.timeZone = timeZone
     }
 }
 

@@ -21,6 +21,13 @@ import Testing
         #expect(PaymentLinks.cashApp(tag: "", cents: 100) == nil)
     }
 
+    @Test func handlesDropOtherCharacters() {
+        #expect(PaymentLinks.venmo(handle: " @le ila/<x>?", cents: 100, note: "x")?.absoluteString
+            == "https://venmo.com/u/leilax?txn=pay&amount=1.00&note=x")
+        #expect(PaymentLinks.cashApp(tag: "$le_i-la#1", cents: 100)?.absoluteString == "https://cash.app/$le_i-la1/1.00")
+        #expect(PaymentLinks.clean(" @Leila_9-x! ") == "Leila_9-x")
+    }
+
     @Test func formatCentsCases() {
         #expect(formatCents(2000) == "$20")
         #expect(formatCents(2050) == "$20.50")

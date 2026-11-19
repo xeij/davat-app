@@ -38,23 +38,35 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
         var id: UUID, displayName: String, venmo: String, cashtag: String
         enum CodingKeys: String, CodingKey { case id, venmo, cashtag; case displayName = "display_name" }
     }
-    private struct InviteRow: Codable {
+    struct InviteRow: Codable {
         var id: UUID, hostID: UUID, title: String, startsAt: Date?, location: String, details: String
-        var design: Design, posterPath: String?, priceCents: Int?, hostPays: Bool, updatedAt: Date
+        var design: Design, posterPath: String?, priceCents: Int?, hostPays: Bool, updatedAt: Date, timeZone: String?
         enum CodingKeys: String, CodingKey {
             case id, title, location, details, design
             case hostID = "host_id", startsAt = "starts_at", posterPath = "poster_path"
-            case priceCents = "price_cents", hostPays = "host_pays", updatedAt = "updated_at"
+            case priceCents = "price_cents", hostPays = "host_pays", updatedAt = "updated_at", timeZone = "time_zone"
         }
         init(_ i: Invite) {
             id = i.id; hostID = i.hostID; title = i.title; startsAt = i.startsAt; location = i.location
             details = i.details; design = i.design; posterPath = i.posterPath
             priceCents = i.fundraiser?.priceCents; hostPays = i.fundraiser?.hostPays ?? false; updatedAt = i.updatedAt
+            timeZone = i.timeZone
         }
         var invite: Invite {
             Invite(id: id, hostID: hostID, title: title, startsAt: startsAt, location: location, details: details,
                    design: design, posterPath: posterPath,
-                   fundraiser: priceCents.map { Fundraiser(priceCents: $0, hostPays: hostPays) }, updatedAt: updatedAt)
+                   fundraiser: priceCents.map { Fundraiser(priceCents: $0, hostPays: hostPays) }, updatedAt: updatedAt,
+                   timeZone: timeZone)
+        }
+        /// Writes nils as null: an upsert leaves out missing keys, so turning the fundraiser off would not clear it.
+        func encode(to encoder: Encoder) throws {
+            var c = encoder.container(keyedBy: CodingKeys.self)
+            try c.encode(id, forKey: .id); try c.encode(hostID, forKey: .hostID); try c.encode(title, forKey: .title)
+            try c.encode(startsAt, forKey: .startsAt); try c.encode(location, forKey: .location)
+            try c.encode(details, forKey: .details); try c.encode(design, forKey: .design)
+            try c.encode(posterPath, forKey: .posterPath); try c.encode(priceCents, forKey: .priceCents)
+            try c.encode(hostPays, forKey: .hostPays); try c.encode(updatedAt, forKey: .updatedAt)
+            try c.encode(timeZone, forKey: .timeZone)
         }
     }
     private struct ResponseRow: Codable {
@@ -90,7 +102,15 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
         try await client.auth.signUp(email: email, password: password).user.id
     }
     public func signOut() async throws { try await client.auth.signOut() }
+    /// SQL can't delete storage objects, so remove the user's images first. Best effort: a failure here
+    /// still deletes the account, and leftovers can be removed in the dashboard.
     public func deleteAccount() async throws {
+        let folder = try await client.auth.session.user.id.uuidString.lowercased()
+        let bucket = client.storage.from("posters")
+        for _ in 0..<20 {   // 100 per page; each pass removes what it listed
+            guard let files = try? await bucket.list(path: folder), !files.isEmpty,
+                  (try? await bucket.remove(paths: files.map { "\(folder)/\($0.name)" })) != nil else { break }
+        }
         try await client.rpc("delete_me").execute()
         try? await client.auth.signOut()
     }
@@ -166,7 +186,11 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
             name: r.name, rsvp: r.rsvp, paid: r.paid ? true : nil)).execute()
     }
     public func setPaid(responseID: UUID, paid: Bool) async throws {
-        try await client.from("responses").update(["paid": paid]).eq("id", value: responseID).execute()
+        // return=minimal: the default returns every column, and guest_token isn't readable
+        try await client.from("responses").update(["paid": paid], returning: .minimal).eq("id", value: responseID).execute()
+    }
+    public func deleteResponse(id: UUID) async throws {
+        try await client.from("responses").delete(returning: .minimal).eq("id", value: id).execute()
     }
 
     public func messages(inviteID: UUID) async throws -> [ChatMessage] {
@@ -187,17 +211,22 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
         try await client.rpc("post_message", params: PostArgs(inviteID: m.inviteID, name: m.name, body: m.body)).execute()
     }
 
+    public func deleteMessage(id: UUID) async throws {
+        try await client.from("messages").delete(returning: .minimal).eq("id", value: id).execute()
+    }
+
     public func changes(inviteID: UUID) -> AsyncStream<Void> {
         let client = client
-        let channel = client.channel("invite-\(inviteID.uuidString)")
+        let channel = client.channel("invite-\(inviteID.uuidString)-\(UUID().uuidString)")   // one per stream, so two screens don't share
         let filter = RealtimePostgresFilter.eq("invite_id", value: inviteID.uuidString)
         let r = channel.postgresChange(AnyAction.self, schema: "public", table: "responses", filter: filter)
         let m = channel.postgresChange(AnyAction.self, schema: "public", table: "messages", filter: filter)
         return AsyncStream { cont in
             let task = Task {
-                // Realtime only reaches the host (RLS). Everyone also gets a 4 second tick so guests see updates.
-                try? await channel.subscribeWithError()
+                // Realtime only reaches the host (RLS). Everyone also gets a 4 second tick so guests see updates;
+                // it starts right away, alongside the subscribe.
                 await withTaskGroup(of: Void.self) { g in
+                    g.addTask { try? await channel.subscribeWithError() }
                     g.addTask {
                         while !Task.isCancelled {
                             try? await Task.sleep(for: .seconds(4))

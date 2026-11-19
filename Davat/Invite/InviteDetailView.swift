@@ -13,6 +13,8 @@ struct InviteDetailView: View {
     @State private var confirmDelete = false
     @State private var error: String?
     @State private var loadError: String?
+    @State private var messageCount = 0
+    @State private var chatting = false
 
     enum EditStep: Identifiable { case design, details; var id: Self { self } }
 
@@ -36,6 +38,11 @@ struct InviteDetailView: View {
                 }
                 .buttonStyle(.glassProminent).controlSize(.large)
                 if let f = invite.fundraiser { fundraiserCard(f) }
+                Button { chatting = true } label: {
+                    Label(messageCount == 0 ? "chat" : "chat · \(messageCount)", systemImage: "bubble.left.and.bubble.right")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.glass).controlSize(.large)
                 guests
                 if let loadError {
                     Label(loadError, systemImage: "exclamationmark.triangle").font(.footnote).foregroundStyle(.secondary)
@@ -60,6 +67,7 @@ struct InviteDetailView: View {
         .confirmationDialog("delete this invite?", isPresented: $confirmDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) { delete() }
         } message: { Text("the link stops working for everyone.") }
+        .sheet(isPresented: $chatting) { ChatView(invite: invite) }
         .fullScreenCover(item: $editing) { step in
             InviteComposer(invite: invite, detailsFirst: step == .details) { invite = $0; editing = nil }
         }
@@ -72,7 +80,8 @@ struct InviteDetailView: View {
         #if DEBUG
         .task {
             let args = ProcessInfo.processInfo.arguments
-            if args.contains("-demoGuests") { await simulateGuests() }
+            if args.contains("-demoGuests") || args.contains("-demoChat") { await simulateGuests() }
+            if args.contains("-demoChat") { chatting = true }
             if args.contains("-demoEditor") { editing = .design }
             if args.contains("-demoDetails") { editing = .details }
         }
@@ -131,7 +140,9 @@ struct InviteDetailView: View {
         do {
             responses = try await session.backend.responses(inviteID: invite.id)
             summary = try await session.backend.summary(inviteID: invite.id)
+            messageCount = try await session.backend.messages(inviteID: invite.id).count
             loadError = nil
+        } catch is CancellationError {
         } catch {
             loadError = "couldn't refresh: \(error.localizedDescription)"
         }
@@ -151,6 +162,12 @@ struct InviteDetailView: View {
         for (i, g) in guests.enumerated() {
             try? await session.backend.respond(Response(id: UUID(), inviteID: invite.id, name: g.0, userID: nil,
                                                         guestToken: "simulated-guest-\(i)-token", rsvp: g.1, paid: g.2))
+        }
+        let said = ["see you there", "can i bring anything?", "so excited"]
+        for (i, text) in said.enumerated() {
+            let id = UUID(uuidString: "00000000-0000-0000-0000-00000000010\(i)")!   // fixed, so tapping again doesn't duplicate
+            try? await session.backend.send(ChatMessage(id: id, inviteID: invite.id, name: guests[i].0, userID: nil,
+                                                        body: text, createdAt: Date(timeIntervalSinceNow: Double(i - 3) * 60)))
         }
         await reload()
     }

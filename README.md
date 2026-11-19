@@ -1,85 +1,80 @@
 # Davat
 
-Davat is an iPhone app and iMessage extension for making a custom invite, sending it as a link, and seeing who is coming. A host can also turn an invite into a group fundraiser, where each guest owes a share of a cost and pays the host through Venmo or Cash App.
+Davat (Farsi for "invite") is an iPhone app for designing a custom invite and sending it to friends over iMessage. Friends RSVP with one tap, and when the host is splitting a cost, such as $20 each toward an $80 dinner, each guest chips in their share through Venmo or Cash App while everyone watches the total fill up.
+
+Guests don't need the app. A friend who has Davat answers inside the iMessage bubble. Everyone else gets a link that opens a web page with the same invite.
 
 <p>
-  <img src="docs/screenshots/editor-picker.jpg" width="200" alt="Template picker">
-  <img src="docs/screenshots/editor-selected.jpg" width="200" alt="Layer editor with a text layer selected">
-  <img src="docs/screenshots/publish-detail.jpg" width="200" alt="Published invite with guest list">
-  <img src="docs/screenshots/imessage-guest-expanded.jpg" width="200" alt="Guest RSVP card from the iMessage extension">
+  <img src="docs/screenshots/welcome.jpg" width="190" alt="Welcome screen">
+  <img src="docs/screenshots/editor-selected.jpg" width="190" alt="Invite editor with a text layer selected">
+  <img src="docs/screenshots/publish-detail.jpg" width="190" alt="Published invite with fundraiser totals and guest list">
+  <img src="docs/screenshots/web-demo.jpg" width="190" alt="Guest web page with RSVP, chip-in card and chat">
 </p>
 
-Left to right: the template picker, the layer editor, a published invite as the host sees it, and the guest card the iMessage extension shows (rendered in a harness, not inside Messages).
+From left to right, the screenshots show:
+1. the welcome screen;
+2. the layer editor;
+3. a published invite, as the host sees it, with the fundraiser total and guest list;
+4. the guest web page.
 
-Stack: SwiftUI on iOS 26, a local Swift package (`DavatKit`), Supabase (Postgres, auth, storage, realtime), a static web page with one Vercel function, XcodeGen.
+A demo of the guest page is live at [davat-app-web.vercel.app/page.html?demo=1](https://davat-app-web.vercel.app/page.html?demo=1).
 
-## Quickstart
+Stack: SwiftUI on iOS 26, an iMessage extension, a local Swift package (`DavatKit`), Supabase (Postgres, auth, storage, realtime), a static web page with one Vercel function.
 
-Prerequisites: macOS with Xcode 27 or later, an iOS 26 simulator (the commands below use iPhone 17 Pro on iOS 26.5), XcodeGen, and Node for the web tests (tested with Node 26).
+## What it does
+
+- **Editor.** The host starts from a blank canvas or one of 13 templates, from disco to delicate floral. Every element is a layer that can be dragged, pinched and rotated:
+  - text in about 25 fonts, with outline, shadow, gradient and curved text;
+  - stickers, photos and shapes;
+  - a background that can be a color, gradient, pattern, photo or an AI image from Apple's Image Playground;
+  - animated confetti, snow, sparkle, hearts, bubbles or petals.
+- **Sending.** The invite goes out as a live iMessage bubble or as a link, and a pasted link previews with the poster, title and date.
+- **RSVP and fundraising.** Guests answer going, maybe or can't. In fundraiser mode the goal is the per-person price times the number of people going. Guests see how much is needed and how much is in, but not who has paid. The host sees who has paid and confirms each payment.
+- **Chat.** Each invite has its own chat, shared by the app and the web page.
+
+## How it works
+
+**One design, shown everywhere as one image.** An invite's design is stored as JSON, a background plus a list of layers placed as fractions of the canvas, so it stays editable. On publish, the app also renders a 1080x1920 PNG poster. The web page, link previews and the iMessage bubble only ever show that PNG. As a result, the invite looks identical in all three places, and nothing outside the app has to reimplement the renderer. The tradeoff is that the poster's text isn't selectable on the web, while the event details below it are real text. Decoding skips layer kinds that the running build doesn't know, so an older app can still open a design made by a newer one.
+
+**A link is the key.** Invite ids are random UUIDs, so holding the link is what lets someone respond. Row level security gives anonymous users no read access to any table. Guests can only call a handful of database functions that each take an invite id: `get_invite`, `respond`, `invite_public_summary`, `invite_messages` and `post_message`. No query lists invites, and the public summary never says who has paid. A SQL test suite (`supabase/tests/rls.sql`) checks these rules against the hosted database.
+
+**Polling for guests.** Supabase realtime passes through row level security, so only the signed-in host receives live change events. Guests poll every 4 seconds instead, on the web page (only while the tab is visible) and in the extension. They see changes a few seconds late, and in return guests never get direct read access to any table.
+
+**The iMessage bubble updates in place.** The extension sends the invite as an `MSMessage` on an `MSSession`. When a guest answers, it posts on the same session, so Messages replaces the bubble with one showing the latest state ("sara's in · 3 going · $60 of $80") instead of stacking up new ones. Tapping "I paid" deliberately leaves the bubble alone, since updating it would tell the whole thread who paid.
+
+**Money is integer cents, and Davat never holds it.** Prices, goals and totals are integer cents end to end, in Swift, SQL and JavaScript. The pay buttons open a Venmo or Cash App link to the host's handle with the amount filled in. The guest taps "I paid", and the host can switch that off for anyone who didn't actually pay.
+
+**Two backends behind one protocol.** The app, the extension and the tests all talk to a `Backend` protocol, which has two implementations:
+- `SupabaseBackend`, used in production;
+- `LocalBackend`, which stores JSON files on the device.
+
+Because of the local version, the whole host flow could be built and tested before any server existed.
+
+**Web page.** `web/` is static HTML and JavaScript with no build step and no npm dependencies. A single Vercel function returns the page with Open Graph tags filled in for each invite.
+
+## Status
+
+Working:
+- The app runs against a live Supabase project, and the guest web page is deployed on Vercel.
+- A published invite opens from its link, and a web RSVP shows up in the host's app.
+- The row level security tests pass on the hosted database.
+- 43 Swift tests, 11 web tests and a UI test that taps through the whole host flow all pass.
+
+Not yet done:
+- The app isn't on TestFlight or the App Store.
+- Sign in with Apple and the iMessage bubble between two real phones are waiting on a signed device build.
+- There's no in-app payment and no push notification for new RSVPs.
+
+## Running it
+
+Requires Xcode 27 or later with an iOS 26 simulator, [XcodeGen](https://github.com/yonaskolb/XcodeGen), and Node for the web tests.
 
 ```sh
 brew install xcodegen
 xcodegen generate
-xcodebuild -project Davat.xcodeproj -scheme Davat \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' build CODE_SIGNING_ALLOWED=NO
-(cd DavatKit && swift test)          # models, fundraiser math, payment links, LocalBackend
+open Davat.xcodeproj                 # run the Davat scheme on an iPhone simulator
+(cd DavatKit && swift test)          # models, fundraiser math, payment links
 node --test web/test                 # payment links and the link preview function
 ```
 
-With no Supabase keys configured the app runs on `LocalBackend`, which stores everything as JSON files on the device, so the whole host flow works in the simulator without an account anywhere. One UI test taps through template, editor, details and publish against that local store:
-
-```sh
-xcodebuild -project Davat.xcodeproj -scheme Davat \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro,OS=26.5' test CODE_SIGNING_ALLOWED=NO
-```
-
-The destination simulator has to be installed (Xcode > Settings > Components); `xcrun simctl list devices` shows which ones are, and any iOS 26 iPhone works in its place.
-
-The guest web page runs from a plain static server and shows a built-in demo invite when it has no keys:
-
-```sh
-python3 -m http.server 4173 -d web    # then open http://localhost:4173/page.html?demo=1
-```
-
-## Backend setup
-
-`docs/supabase-setup.md` walks through it step by step. In short:
-
-1. Create a Supabase project and run `supabase/migrations/0001_init.sql` in the SQL editor. `supabase/tests/rls.sql` checks the access rules.
-2. Copy the Project URL and the `anon` key from Project Settings > API. Put them in `SupabaseURL` and `SupabaseAnonKey` under both targets in `project.yml`, then run `xcodegen generate`. Put the same two values in `web/config.js`, or set `SUPABASE_URL` and `SUPABASE_ANON_KEY` in Vercel. Both are public values; the `service_role` key never goes in the app or the page.
-3. Deploy `web/` to Vercel as the project root. `/i/:id` is rewritten to `web/api/invite.js`.
-
-Placeholders to replace before a release:
-
-- `TEAMID` in `web/.well-known/apple-app-site-association` (the Apple developer team id). The file is kept for a future in-app guest view; v1 declares no associated domain, so invite links always open the web page, which does everything a guest needs.
-- `app-id=0` in the `apple-itunes-app` meta tag in `web/api/invite.js` (the App Store id).
-- The contact address in `web/privacy.html`.
-- `davat-app-web.vercel.app` in `DavatConfig.webBaseURL`, if the site lives elsewhere.
-
-## How it works
-
-**One design, two forms.** An invite's design is JSON: a background plus a list of layers (text, emoji, image, shape) placed as fractions of the canvas. The app keeps editing that JSON. On publish it also renders a 1080x1920 PNG poster and uploads it under a fixed path per invite. The web page, link previews and the iMessage bubble only ever show the PNG, so the invite looks the same everywhere and nothing outside the app has to reimplement the renderer. The cost is that a design change needs a republish, which overwrites the PNG behind the same link. Decoding drops layer kinds the running build does not know, so an older app can still open a newer design.
-
-**Two backends behind one protocol.** `Backend` in `DavatKit` has two implementations. `LocalBackend` is file based and used for development, tests and the simulator. `SupabaseBackend` is used when the Info.plist keys are set. The app, the iMessage extension and the tests all talk to the protocol, which is why the app could be built and exercised end to end before any server existed.
-
-**Guests only get RPCs.** Row level security gives the `anon` role no read access to any table; its only direct write is an insert into the write-only `reports` table. A guest can call `get_invite`, `respond`, `invite_public_summary`, `invite_messages` and `post_message`, each of which takes an invite id. Invite ids are random UUIDs, so a link works as a capability: anyone holding it can RSVP, but there is no query that lists invites, and the public summary never says who has paid. Guests are anonymous; a random token kept in `localStorage` (or in the extension's defaults) lets them change their answer later.
-
-**Polling for guests.** Supabase realtime goes through RLS, so only the signed-in host receives change events. Guests poll every 4 seconds instead, on the web page (only while the tab is visible) and in the extension. This keeps anon access to the RPCs above at the cost of a few seconds of lag.
-
-**The iMessage bubble updates in place.** The extension sends the invite as an `MSMessage` on an `MSSession` with the poster as its image. When a guest answers from the bubble, the extension posts a new message on the same session, so Messages replaces the bubble with one that carries the latest caption ("sara's in · 3 going · $60 of $80") instead of stacking up new ones. Tapping "I paid" does not update the bubble, since that would tell the whole thread who paid. Chat and reporting happen on the web page, which the card links to.
-
-**Money is integer cents.** Prices, goals and totals are `Int` cents end to end, in Swift, SQL and JavaScript. The goal is the per-person price times the people going (plus the host if they pay too). Davat moves no money: the pay buttons open a prefilled Venmo or Cash App link to the host's handle, the guest taps "I paid", and the host confirms with a switch on the guest list. "I paid" also marks the guest as going, since only going guests count toward the total.
-
-**Web page.** `web/` is static HTML and JS with no build step and no npm dependencies. The Vercel function fetches the invite and returns the page with Open Graph tags, so a pasted link previews with the poster and date. The page also has a "report this invite" form that inserts into `reports`, which is read from the Supabase dashboard. Hosts moderate their own invites: a long press deletes a chat message or a guest's answer. Posters are linked with `?v=<last update>` so a republish, which overwrites the same file, is not hidden behind storage caching. The privacy policy is `web/privacy.html`, linked from the app's profile screen.
-
-## Status
-
-Works locally: the editor, publishing, the host detail screen with guest list, paid switches and chat, account deletion, and the guest web page in demo mode. Logic tests, web tests and the UI test pass on LocalBackend.
-
-Not yet run for real:
-
-- The app has not been pointed at a live Supabase project, and `web/` has not been deployed to Vercel. `supabase/tests/rls.sql` has not been run against a hosted database yet.
-- The iMessage flow has not been exercised end to end in Messages between two devices; the extension builds and its views were checked in a harness.
-- Sign in with Apple needs a signed build with a development team and the capability enabled, so it has not been tried. Email sign-in is the tested path.
-
-Known limitations: an invite stores the host's time zone when it is published, and the web page and link previews show the start time in that zone; invites without one show only the date, in UTC. Account deletion removes the user's uploaded images from the app before deleting the account, but only best effort: if that step fails, the account is still deleted and the files stay in storage until removed from the dashboard, since storage objects cannot be removed from SQL. There is no in-app payment and no push notification for new RSVPs.
+The checked-in config points at the project's own Supabase backend. With `SupabaseURL` and `SupabaseAnonKey` left empty in `project.yml`, the app runs on `LocalBackend` instead. [docs/supabase-setup.md](docs/supabase-setup.md) covers setting up a new Supabase project and deploying the web page.

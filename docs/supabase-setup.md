@@ -17,3 +17,10 @@ Notes:
 - Poster images live in the public `posters` storage bucket. The app has to upload under a folder named after the user's id, such as `<user id>/<invite id>.png`. Storage rejects any other folder, and `invites.poster_path` must be exactly `<uuid>/<uuid>.png` in lowercase.
 - Deleting an account removes the user's profile and invites, and with the invites every guest response and chat message on them. It also removes that user's own responses and messages on other hosts' invites. Supabase does not allow deleting storage objects from SQL, so the app first lists and removes every file under the user's folder in `posters`, then calls `delete_me`. That cleanup is best effort: if it fails (no network, say), the account is still deleted and the leftover files can be removed from Storage in the dashboard.
 - Hosts can delete chat messages and guest responses on their own invites. Guests report an invite through the form on the web page; reports land in the `reports` table.
+
+## Before a release
+
+- `TEAMID` in `web/.well-known/apple-app-site-association` (the Apple developer team id). The file is kept for a future in-app guest view; v1 declares no associated domain, so invite links always open the web page.
+- `app-id=0` in the `apple-itunes-app` meta tag in `web/api/invite.js` (the App Store id).
+- The contact address in `web/privacy.html`.
+- `DavatConfig.webBaseURL`, if the web page moves off `davat-app-web.vercel.app`.

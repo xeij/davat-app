@@ -54,7 +54,7 @@ Placeholders to replace before a release:
 - `TEAMID` in `web/.well-known/apple-app-site-association` (the Apple developer team id). The file is kept for a future in-app guest view; v1 declares no associated domain, so invite links always open the web page, which does everything a guest needs.
 - `app-id=0` in the `apple-itunes-app` meta tag in `web/api/invite.js` (the App Store id).
 - The contact address in `web/privacy.html`.
-- `davat.vercel.app` in `DavatConfig.webBaseURL`, if the site lives elsewhere.
+- `davat-app-web.vercel.app` in `DavatConfig.webBaseURL`, if the site lives elsewhere.
 
 ## How it works
 

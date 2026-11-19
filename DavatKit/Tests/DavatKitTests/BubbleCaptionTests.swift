@@ -35,6 +35,6 @@ import Testing
         var c = URLComponents(url: DavatConfig.link(for: id), resolvingAgainstBaseURL: false)!
         c.queryItems = [.init(name: "v", value: "123")]
         #expect(DavatConfig.inviteID(from: c.url!) == id)
-        #expect(DavatConfig.inviteID(from: URL(string: "https://davat.vercel.app/x/abc")!) == nil)
+        #expect(DavatConfig.inviteID(from: URL(string: "https://davat-app-web.vercel.app/x/abc")!) == nil)
     }
 }

@@ -27,7 +27,7 @@ test("injects escaped preview tags", async () => {
   assert.equal(seen[0].init.headers.Authorization, "Bearer anon");
   assert.match(res.body, /<meta property="og:title" content="&lt;script&gt;&quot;x&quot; &amp; &#39;y&#39;&lt;\/script&gt;">/);
   assert.ok(!res.body.includes(`<script>"x"`));
-  assert.match(res.body, /og:description" content="Sat, Dec 5, 8:00 PM"/);
+  assert.match(res.body, /og:description" content="sat, dec 5, 8:00 pm"/);
   assert.match(res.body, /og:image" content="https:\/\/x\.supabase\.co\/storage\/v1\/object\/public\/posters\/u\/p\.png"/);
   assert.match(res.body, /app-argument=https:\/\/davat\.vercel\.app\/i\/0b6a3c6e/);
   assert.match(res.body, /twitter:card" content="summary_large_image"/);

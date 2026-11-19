@@ -82,6 +82,15 @@ struct LocalBackendTests {
         #expect(!FileManager.default.fileExists(atPath: url.path))
     }
 
+    @Test func deleteImageRemovesTheFile() async throws {
+        let b = make()
+        let path = try await b.uploadImage(Data([1, 2, 3]), path: "p/x.png")
+        let url = try #require(b.imageURL(path: path))
+        try await b.deleteImage(path: path)
+        #expect(!FileManager.default.fileExists(atPath: url.path))
+        try await b.deleteImage(path: path)   // a second delete is not an error
+    }
+
     @Test func summaryHidesPaidAndTotals() async throws {
         let b = make()
         var inv = invite()

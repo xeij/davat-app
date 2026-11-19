@@ -117,6 +117,7 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
     public func uploadImage(_ png: Data, path: String) async throws -> String {
         try await client.storage.from("posters").upload(path, data: png, options: FileOptions(contentType: "image/png", upsert: true)).path
     }
+    public func deleteImage(path: String) async throws { _ = try await client.storage.from("posters").remove(paths: [path]) }
     public func imageURL(path: String) -> URL? { try? client.storage.from("posters").getPublicURL(path: path) }
 
     private struct InviteArg: Encodable {

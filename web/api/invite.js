@@ -23,7 +23,7 @@ function config() {
 const dateLine = (iso) =>
   new Intl.DateTimeFormat("en-US", {
     weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/New_York",
-  }).format(new Date(iso));
+  }).format(new Date(iso)).toLowerCase();   // the app's voice, same as the date line on the page
 
 const GONE = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1"><title>davat</title>

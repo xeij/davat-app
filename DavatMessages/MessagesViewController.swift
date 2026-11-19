@@ -58,7 +58,8 @@ final class MessagesViewController: MSMessagesAppViewController {
     /// A ~480px-tall poster for the compact row, decoded straight to that size. Only these are cached.
     func thumbnail(_ invite: Invite) async -> UIImage? {
         guard let path = invite.posterPath else { return nil }
-        if let t = thumbs[path] { return t }
+        let key = "\(path)@\(invite.updatedAt.timeIntervalSince1970)"   // a republish keeps the path, so key on the version too
+        if let t = thumbs[key] { return t }
         guard let url = backend.imageURL(path: path) else { return nil }
         let src: CGImageSource? = if url.isFileURL {
             CGImageSourceCreateWithURL(url as CFURL, nil)
@@ -68,7 +69,7 @@ final class MessagesViewController: MSMessagesAppViewController {
         let options = [kCGImageSourceCreateThumbnailFromImageAlways: true, kCGImageSourceThumbnailMaxPixelSize: 480,
                        kCGImageSourceCreateThumbnailWithTransform: true] as CFDictionary
         let t = src.flatMap { CGImageSourceCreateThumbnailAtIndex($0, 0, options) }.map { UIImage(cgImage: $0) }
-        thumbs[path] = t
+        thumbs[key] = t
         return t
     }
 

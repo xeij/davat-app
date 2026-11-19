@@ -383,7 +383,7 @@ async function start() {
   if (invite.starts_at) {
     $("#when").textContent = new Date(invite.starts_at).toLocaleString(undefined, {
       weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit",
-    });
+    }).toLowerCase();
   }
   $("#where").textContent = invite.location;
   $("#details").textContent = invite.details;

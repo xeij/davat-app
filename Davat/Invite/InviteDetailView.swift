@@ -150,7 +150,13 @@ struct InviteDetailView: View {
 
     private func delete() {
         Task {
-            do { try await session.backend.deleteInvite(id: invite.id); dismiss() }
+            do {
+                try await session.backend.deleteInvite(id: invite.id)
+                for path in [invite.posterPath].compactMap(\.self) + invite.design.imagePaths {
+                    try? await session.backend.deleteImage(path: path)   // best effort: the invite is already gone
+                }
+                dismiss()
+            }
             catch { self.error = error.localizedDescription }
         }
     }

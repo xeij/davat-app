@@ -51,10 +51,10 @@ python3 -m http.server 4173 -d web    # then open http://localhost:4173/page.htm
 
 Placeholders to replace before a release:
 
-- `TEAMID` in `web/.well-known/apple-app-site-association` (the Apple developer team id), so invite links open the app.
+- `TEAMID` in `web/.well-known/apple-app-site-association` (the Apple developer team id). The file is kept for a future in-app guest view; v1 declares no associated domain, so invite links always open the web page, which does everything a guest needs.
 - `app-id=0` in the `apple-itunes-app` meta tag in `web/api/invite.js` (the App Store id).
 - The contact address in `web/privacy.html`.
-- `davat.vercel.app` in `DavatConfig.webBaseURL` and the associated domains entry in `project.yml`, if the site lives elsewhere.
+- `davat.vercel.app` in `DavatConfig.webBaseURL`, if the site lives elsewhere.
 
 ## How it works
 
@@ -66,11 +66,11 @@ Placeholders to replace before a release:
 
 **Polling for guests.** Supabase realtime goes through RLS, so only the signed-in host receives change events. Guests poll every 4 seconds instead, on the web page (only while the tab is visible) and in the extension. This keeps anon access to the RPCs above at the cost of a few seconds of lag.
 
-**The iMessage bubble updates in place.** The extension sends the invite as an `MSMessage` on an `MSSession` with the poster as its image. When a guest answers from the bubble, the extension posts a new message on the same session, so Messages replaces the bubble with one that carries the latest caption ("sara's in · 3 going · $60 of $80") instead of stacking up new ones.
+**The iMessage bubble updates in place.** The extension sends the invite as an `MSMessage` on an `MSSession` with the poster as its image. When a guest answers from the bubble, the extension posts a new message on the same session, so Messages replaces the bubble with one that carries the latest caption ("sara's in · 3 going · $60 of $80") instead of stacking up new ones. Tapping "I paid" does not update the bubble, since that would tell the whole thread who paid. Chat and reporting happen on the web page, which the card links to.
 
-**Money is integer cents.** Prices, goals and totals are `Int` cents end to end, in Swift, SQL and JavaScript. The goal is the per-person price times the people going (plus the host if they pay too). Davat moves no money: the pay buttons open a prefilled Venmo or Cash App link to the host's handle, the guest taps "I paid", and the host confirms with a switch on the guest list.
+**Money is integer cents.** Prices, goals and totals are `Int` cents end to end, in Swift, SQL and JavaScript. The goal is the per-person price times the people going (plus the host if they pay too). Davat moves no money: the pay buttons open a prefilled Venmo or Cash App link to the host's handle, the guest taps "I paid", and the host confirms with a switch on the guest list. "I paid" also marks the guest as going, since only going guests count toward the total.
 
-**Web page.** `web/` is static HTML and JS with no build step and no npm dependencies. The Vercel function fetches the invite and returns the page with Open Graph tags, so a pasted link previews with the poster and date. The page also has a "report this invite" form that inserts into `reports`, which is read from the Supabase dashboard. The privacy policy is `web/privacy.html`, linked from the app's profile screen.
+**Web page.** `web/` is static HTML and JS with no build step and no npm dependencies. The Vercel function fetches the invite and returns the page with Open Graph tags, so a pasted link previews with the poster and date. The page also has a "report this invite" form that inserts into `reports`, which is read from the Supabase dashboard. Hosts moderate their own invites: a long press deletes a chat message or a guest's answer. Posters are linked with `?v=<last update>` so a republish, which overwrites the same file, is not hidden behind storage caching. The privacy policy is `web/privacy.html`, linked from the app's profile screen.
 
 ## Status
 
@@ -82,4 +82,4 @@ Not yet run for real:
 - The iMessage flow has not been exercised end to end in Messages between two devices; the extension builds and its views were checked in a harness.
 - Sign in with Apple needs a signed build with a development team and the capability enabled, so it has not been tried. Email sign-in is the tested path.
 
-Known limitations: invites store no time zone, so link previews show times in US Eastern. Uploaded images stay in Supabase storage after an account is deleted, since storage objects cannot be removed from SQL. There is no in-app payment and no push notification for new RSVPs.
+Known limitations: an invite stores the host's time zone when it is published, and the web page and link previews show the start time in that zone; invites without one show only the date, in UTC. Account deletion removes the user's uploaded images from the app before deleting the account, but only best effort: if that step fails, the account is still deleted and the files stay in storage until removed from the dashboard, since storage objects cannot be removed from SQL. There is no in-app payment and no push notification for new RSVPs.

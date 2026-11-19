@@ -25,7 +25,6 @@ targets:
         com.apple.security.application-groups: [group.com.davat.app]
         keychain-access-groups: ["$(AppIdentifierPrefix)com.davat.shared"]
         com.apple.developer.applesignin: [Default]
-        com.apple.developer.associated-domains: ["applinks:davat.vercel.app"]
     info:
       path: Davat/Info.plist
       properties:

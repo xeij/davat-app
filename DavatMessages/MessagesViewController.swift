@@ -1,4 +1,5 @@
 import DavatKit
+import ImageIO
 import Messages
 import SwiftUI
 
@@ -42,7 +43,7 @@ final class MessagesViewController: MSMessagesAppViewController {
     var style: MSMessagesAppPresentationStyle = .compact
     var selected: MSMessage?
     @ObservationIgnored weak var controller: MSMessagesAppViewController?
-    @ObservationIgnored private var posters: [String: UIImage] = [:]
+    @ObservationIgnored private var thumbs: [String: UIImage] = [:]
 
     /// Shared login: LocalBackend reads the App Group container and SupabaseBackend the App Group keychain.
     func restore() async {
@@ -54,15 +55,28 @@ final class MessagesViewController: MSMessagesAppViewController {
         loaded = true
     }
 
-    /// The published PNG: a file for LocalBackend, a download otherwise. Kept in memory for the session.
-    func poster(_ invite: Invite) async -> UIImage? {
+    /// A ~480px-tall poster for the compact row, decoded straight to that size. Only these are cached.
+    func thumbnail(_ invite: Invite) async -> UIImage? {
         guard let path = invite.posterPath else { return nil }
-        if let ui = posters[path] { return ui }
+        if let t = thumbs[path] { return t }
         guard let url = backend.imageURL(path: path) else { return nil }
+        let src: CGImageSource? = if url.isFileURL {
+            CGImageSourceCreateWithURL(url as CFURL, nil)
+        } else {
+            (try? await URLSession.shared.data(from: url).0).flatMap { CGImageSourceCreateWithData($0 as CFData, nil) }
+        }
+        let options = [kCGImageSourceCreateThumbnailFromImageAlways: true, kCGImageSourceThumbnailMaxPixelSize: 480,
+                       kCGImageSourceCreateThumbnailWithTransform: true] as CFDictionary
+        let t = src.flatMap { CGImageSourceCreateThumbnailAtIndex($0, 0, options) }.map { UIImage(cgImage: $0) }
+        thumbs[path] = t
+        return t
+    }
+
+    /// The full published PNG: a file for LocalBackend, a download otherwise. Not cached.
+    func poster(_ invite: Invite) async -> UIImage? {
+        guard let path = invite.posterPath, let url = backend.imageURL(path: path) else { return nil }
         let data = url.isFileURL ? try? Data(contentsOf: url) : try? await URLSession.shared.data(from: url).0
-        let ui = data.flatMap(UIImage.init(data:))
-        posters[path] = ui
-        return ui
+        return data.flatMap(UIImage.init(data:))
     }
 
     /// Inserts a new bubble for the invite into the compose field.
@@ -83,7 +97,7 @@ final class MessagesViewController: MSMessagesAppViewController {
         guard let selected, let conversation = controller?.activeConversation else { return }
         let message = MSMessage(session: selected.session ?? MSSession())
         message.layout = await layout(invite, caption: caption, subcaption: invite.title)
-        message.url = selected.url ?? bubbleURL(invite)
+        message.url = bubbleURL(invite)
         message.summaryText = caption
         try await conversation.send(message)
     }

@@ -33,7 +33,7 @@ private struct HostRow: View {
         } else {
             VStack(alignment: .leading, spacing: 8) {
                 ScrollView(.horizontal) {
-                    HStack(spacing: 12) {
+                    LazyHStack(spacing: 12) {
                         ForEach(model.invites) { invite in
                             Thumb(model: model, invite: invite) {
                                 Task {
@@ -77,7 +77,7 @@ private struct Thumb: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("send \(invite.title)")
-        .task { poster = await model.poster(invite) }
+        .task { poster = await model.thumbnail(invite) }
     }
 }
 

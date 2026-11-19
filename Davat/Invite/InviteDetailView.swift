@@ -9,6 +9,7 @@ struct InviteDetailView: View {
     @State private var responses: [Response] = []
     @State private var summary: PublicSummary?
     @State private var poster: Image?
+    @State private var scroll = ScrollPosition()
     @State private var editing: EditStep?
     @State private var confirmDelete = false
     @State private var error: String?
@@ -55,13 +56,14 @@ struct InviteDetailView: View {
                     Label(loadError, systemImage: "exclamationmark.triangle").font(.footnote).foregroundStyle(.secondary)
                 }
                 #if DEBUG
-                if session.backend is LocalBackend {
+                if session.backend is LocalBackend, !ProcessInfo.processInfo.arguments.contains("-demoGuests") {
                     Button("simulate guests") { Task { await simulateGuests() } }.buttonStyle(.glass)
                 }
                 #endif
             }
             .padding(20)
         }
+        .scrollPosition($scroll)
         .navigationBarTitleDisplayMode(.inline)
         .tint(.saffron)
         .toolbar {
@@ -107,6 +109,10 @@ struct InviteDetailView: View {
         .task {
             let args = ProcessInfo.processInfo.arguments
             if args.contains("-demoGuests") || args.contains("-demoChat") { await simulateGuests() }
+            if args.contains("-demoScrolled") {   // screenshots
+                try? await Task.sleep(for: .seconds(1))
+                scroll.scrollTo(edge: .bottom)
+            }
             if args.contains("-demoChat") { chatting = true }
             if args.contains("-demoEditor") { editing = .design }
             if args.contains("-demoDetails") { editing = .details }

@@ -5,12 +5,13 @@ import SwiftUI
 struct GuestRow: View {
     let response: Response
     let showsPaid: Bool
-    let setPaid: (Bool) -> Void
+    let setPaid: @MainActor (Bool) -> Void
+    @State private var taps = 0   // haptic on the host's own taps, not on refreshes
 
     var body: some View {
         Group {
             if showsPaid {
-                Toggle(isOn: Binding(get: { response.paid }, set: setPaid)) {
+                Toggle(isOn: Binding(get: { response.paid }, set: { taps += 1; setPaid($0) })) {
                     Text(response.name)
                     Text(response.paid ? "paid" : "not yet")
                 }
@@ -20,5 +21,6 @@ struct GuestRow: View {
         }
         .font(.body.weight(.light))
         .padding(.vertical, 4)
+        .sensoryFeedback(.selection, trigger: taps)
     }
 }

@@ -14,6 +14,7 @@ struct ProfileView: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
                 Text("profile").font(.system(size: 40, weight: .thin)).padding(.horizontal, 24).padding(.top, 8)
+                    .accessibilityAddTraits(.isHeader)
             Form {
                 Section("you") {
                     TextField("display name", text: $name)
@@ -21,6 +22,9 @@ struct ProfileView: View {
                     TextField("$cashtag", text: $cashtag).textInputAutocapitalization(.never).autocorrectionDisabled()
                 }
                 if let error { Text(error).foregroundStyle(.red) }
+                Section {
+                    Link("privacy", destination: DavatConfig.webBaseURL.appending(path: "privacy.html"))
+                }
                 Section {
                     Button("Sign out") { Task { do { try await session.signOut() } catch { self.error = error.localizedDescription } } }
                     Button("Delete account", role: .destructive) { confirmDelete = true }

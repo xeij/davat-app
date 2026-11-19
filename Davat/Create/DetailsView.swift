@@ -40,6 +40,7 @@ struct DetailsView: View {
                 TextField("anything else guests should know", text: $invite.details, axis: .vertical).lineLimit(3...8)
             } header: {
                 Text("details").font(.system(size: 40, weight: .thin)).textCase(nil).foregroundStyle(.primary)
+                    .accessibilityAddTraits(.isHeader)
                     .padding(.bottom, 8)
             }
             Section {

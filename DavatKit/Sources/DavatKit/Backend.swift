@@ -13,6 +13,7 @@ public protocol Backend: Sendable {
     func saveInvite(_ i: Invite) async throws
     func deleteInvite(id: UUID) async throws
     func uploadImage(_ png: Data, path: String) async throws -> String   // returns storage path
+    func deleteImage(path: String) async throws
     func imageURL(path: String) -> URL?
     func invite(id: UUID) async throws -> Invite?            // any invite by id, for guests
     func summary(inviteID: UUID) async throws -> PublicSummary // guest-safe: no per-person paid
@@ -125,6 +126,9 @@ public final class LocalBackend: Backend, @unchecked Sendable {
             try png.write(to: url, options: .atomic)
         }
         return path
+    }
+    public func deleteImage(path: String) async throws {
+        lock.withLock { try? FileManager.default.removeItem(at: dir.appending(path: "images/" + path)) }   // already gone is fine
     }
     public func imageURL(path: String) -> URL? { dir.appending(path: "images/" + path) }
 

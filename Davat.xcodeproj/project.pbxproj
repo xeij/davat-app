@@ -22,6 +22,7 @@
 		7174B26237062A1E4C291A02 /* DavatMessages.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0F2BAACB5B49003304BC8C64 /* DavatMessages.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		74A24A1F6D7A05A4FA308FDF /* MessagesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AE5B7EB6AF1BB76F0225D00C /* MessagesViewController.swift */; };
 		7D3ABE437EBB80B8848C6750 /* DavatKit in Frameworks */ = {isa = PBXBuildFile; productRef = 7F7EB71BE21DD9E0FB4B9899 /* DavatKit */; };
+		7EFCF5F05C88B55921C746C5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B2284A36A18E6E053608C13F /* Assets.xcassets */; };
 		8A91DFCCFD0E658644A7A01E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E35B015C9395A0EF56FCA21F /* HomeView.swift */; };
 		9F2C7EEA140E2B557873EB01 /* BubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4947B8E505264006C03BCBB7 /* BubbleView.swift */; };
 		AC0711E82C6E43BEDDA11035 /* TemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E047CF3508A6142C08033D6 /* TemplatePicker.swift */; };
@@ -84,6 +85,7 @@
 		A720A4BAE2F5D2E95F3E61B4 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		ADF12EDB63608B1047D2E47F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AE5B7EB6AF1BB76F0225D00C /* MessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewController.swift; sourceTree = "<group>"; };
+		B2284A36A18E6E053608C13F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BB80FCE0EDF86030114854B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		C03544E870FFBF771D0481C8 /* WelcomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeView.swift; sourceTree = "<group>"; };
 		C386A86E808DCE130482B093 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 		27B4B0143B315DA651955EEE /* DavatMessages */ = {
 			isa = PBXGroup;
 			children = (
+				B2284A36A18E6E053608C13F /* Assets.xcassets */,
 				4947B8E505264006C03BCBB7 /* BubbleView.swift */,
 				FAC376122408BE6304740CD6 /* DavatMessages.entitlements */,
 				22F566C1F00862BDA029A457 /* Info.plist */,
@@ -280,6 +283,7 @@
 			buildConfigurationList = 81265483DAA581344653F115 /* Build configuration list for PBXNativeTarget "DavatMessages" */;
 			buildPhases = (
 				175BA1E251BF062767264BC5 /* Sources */,
+				54F14EF1D0B378BC258A6F42 /* Resources */,
 				F14F9B775234CEE012550BB3 /* Frameworks */,
 			);
 			buildRules = (
@@ -361,6 +365,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		54F14EF1D0B378BC258A6F42 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7EFCF5F05C88B55921C746C5 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8BFE764AC29308FC59916C4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;

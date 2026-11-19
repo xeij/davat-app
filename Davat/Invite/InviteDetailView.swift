@@ -15,6 +15,12 @@ struct InviteDetailView: View {
     @State private var loadError: String?
     @State private var messageCount = 0
     @State private var chatting = false
+    @State private var envelope: Envelope.Stage?
+    @State private var published = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// false right after the first publish, true once the reveal has played. Missing: never reveal.
+    static func envelopeKey(_ id: UUID) -> String { "envelopeSeen." + id.uuidString }
 
     enum EditStep: Identifiable { case design, details; var id: Self { self } }
 
@@ -22,9 +28,10 @@ struct InviteDetailView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 CanvasView(design: invite.design, imageLoader: session.images.image)
+                    .overlay { if let envelope { Envelope(stage: envelope) } }
                     .clipShape(.rect(cornerRadius: 22))
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(invite.title).font(.system(size: 44, weight: .thin))
+                    Text(invite.title).font(.system(size: 44, weight: .thin)).accessibilityAddTraits(.isHeader)
                     Group {
                         if let d = invite.startsAt { Text(d.formatted(date: .complete, time: .shortened)) }
                         if !invite.location.isEmpty { Text(invite.location) }
@@ -69,7 +76,26 @@ struct InviteDetailView: View {
         } message: { Text("the link stops working for everyone.") }
         .sheet(isPresented: $chatting) { ChatView(invite: invite) }
         .fullScreenCover(item: $editing) { step in
-            InviteComposer(invite: invite, detailsFirst: step == .details) { invite = $0; editing = nil }
+            InviteComposer(invite: invite, detailsFirst: step == .details) { invite = $0; editing = nil; published += 1 }
+        }
+        .sensoryFeedback(.success, trigger: published)
+        .onAppear {
+            let key = Self.envelopeKey(invite.id)
+            guard UserDefaults.standard.object(forKey: key) as? Bool == false else { return }
+            published += 1
+            if reduceMotion { UserDefaults.standard.set(true, forKey: key) } else { envelope = .closed }
+        }
+        .task {
+            guard envelope == .closed else { return }
+            do {   // leaving early cancels the sleeps, so the reveal plays again next time
+                try await Task.sleep(for: .milliseconds(250))
+                withAnimation(.spring(duration: 0.4, bounce: 0.15)) { envelope = .flapOpen }
+                try await Task.sleep(for: .milliseconds(350))
+                withAnimation(.spring(duration: 0.5, bounce: 0)) { envelope = .gone }
+                try await Task.sleep(for: .milliseconds(500))
+                envelope = nil
+                UserDefaults.standard.set(true, forKey: Self.envelopeKey(invite.id))
+            } catch {}
         }
         .alert("that didn't work", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
         } message: { Text(error ?? "") }
@@ -150,7 +176,14 @@ struct InviteDetailView: View {
 
     private func delete() {
         Task {
-            do { try await session.backend.deleteInvite(id: invite.id); dismiss() }
+            do {
+                try await session.backend.deleteInvite(id: invite.id)
+                dismiss()
+                let backend = session.backend, paths = [invite.posterPath].compactMap(\.self) + invite.design.imagePaths
+                Task.detached {   // best effort, after the screen is gone: the invite already is
+                    for path in paths { try? await backend.deleteImage(path: path) }
+                }
+            }
             catch { self.error = error.localizedDescription }
         }
     }
@@ -172,4 +205,40 @@ struct InviteDetailView: View {
         await reload()
     }
     #endif
+}
+
+/// Covers the poster the first time a fresh invite is opened: the flap swings open past upright, then the envelope
+/// fades and drops away. The hinge sits below the top edge so the open flap stays inside the poster's clip.
+private struct Envelope: View {
+    enum Stage { case closed, flapOpen, gone }
+    let stage: Stage
+
+    var body: some View {
+        GeometryReader { g in
+            ZStack(alignment: .top) {
+                LinearGradient(colors: [.saffron, .rose], startPoint: .topLeading, endPoint: .bottomTrailing)
+                Flap()
+                    .fill(Color.saffron.mix(with: .white, by: 0.15))
+                    .shadow(color: .black.opacity(0.2), radius: 6, y: 3)
+                    .frame(height: g.size.height * 0.36)
+                    .rotation3DEffect(.degrees(stage == .closed ? 0 : 110), axis: (x: 1, y: 0, z: 0), anchor: .top, perspective: 0.5)
+                    .padding(.top, g.size.height * 0.22)
+            }
+            .offset(y: stage == .gone ? g.size.height : 0)
+            .opacity(stage == .gone ? 0 : 1)
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
+    struct Flap: Shape {
+        func path(in r: CGRect) -> Path {
+            Path { p in
+                p.move(to: CGPoint(x: r.minX, y: r.minY))
+                p.addLine(to: CGPoint(x: r.maxX, y: r.minY))
+                p.addLine(to: CGPoint(x: r.midX, y: r.maxY))
+                p.closeSubpath()
+            }
+        }
+    }
 }

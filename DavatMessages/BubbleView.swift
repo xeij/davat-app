@@ -91,6 +91,7 @@ struct GuestView: View {
     @State private var draft = ""
     @State private var busy = false
     @State private var error: String?
+    @State private var answered = 0
     @AppStorage("guestName") private var guestName = ""
     @AppStorage("guestToken") private var guestToken = ""
 
@@ -119,6 +120,7 @@ struct GuestView: View {
             .padding(20)
         }
         .animation(.spring(duration: 0.4, bounce: 0.2), value: summary)
+        .sensoryFeedback(.success, trigger: answered)
         .task { await load() }
     }
 
@@ -131,7 +133,7 @@ struct GuestView: View {
             .frame(width: 110)
             .clipShape(.rect(cornerRadius: 14))
             VStack(alignment: .leading, spacing: 6) {
-                Text(invite.title).font(.system(size: 34, weight: .thin))
+                Text(invite.title).font(.system(size: 34, weight: .thin)).accessibilityAddTraits(.isHeader)
                 Group {
                     if let d = invite.startsAt { Text(d.formatted(date: .abbreviated, time: .shortened)) }
                     if !invite.location.isEmpty { Text(invite.location) }
@@ -233,6 +235,7 @@ struct GuestView: View {
                 id: UUID(), inviteID: invite.id, name: name, userID: model.userID,
                 guestToken: model.userID == nil ? guestToken : nil, rsvp: rsvp, paid: paid))
             mine = rsvp
+            answered += 1
             UserDefaults.standard.set(rsvp.rawValue, forKey: mineKey)
             let s = try await model.backend.summary(inviteID: invite.id)
             summary = s

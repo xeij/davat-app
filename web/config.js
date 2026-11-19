@@ -1,2 +1,2 @@
 // Paste your Supabase project URL and anon key (Project Settings > API). Both are safe to ship in a web page.
-window.DAVAT_CONFIG = { supabaseURL: "", supabaseAnonKey: "" };
+window.DAVAT_CONFIG = { supabaseURL: "https://tdbpgorzsasszjwoswcb.supabase.co", supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkYnBnb3J6c2Fzc3pqd29zd2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwODQ1MDksImV4cCI6MjExMDY2MDUwOX0.RZYee3W3Ap9v_rYkLXFEm2jsJO6LnzOjDt5t33K9hWU" };

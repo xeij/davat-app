@@ -28,8 +28,8 @@
 		<string>$(PRODUCT_MODULE_NAME).MessagesViewController</string>
 	</dict>
 	<key>SupabaseAnonKey</key>
-	<string></string>
+	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRkYnBnb3J6c2Fzc3pqd29zd2NiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTUwODQ1MDksImV4cCI6MjExMDY2MDUwOX0.RZYee3W3Ap9v_rYkLXFEm2jsJO6LnzOjDt5t33K9hWU</string>
 	<key>SupabaseURL</key>
-	<string></string>
+	<string>https://tdbpgorzsasszjwoswcb.supabase.co</string>
 </dict>
 </plist>

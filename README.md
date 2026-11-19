@@ -8,7 +8,7 @@ Guests don't need the app. A friend who has Davat answers inside the iMessage bu
   <img src="docs/screenshots/welcome.jpg" width="190" alt="Welcome screen">
   <img src="docs/screenshots/editor-selected.jpg" width="190" alt="Invite editor with a text layer selected">
   <img src="docs/screenshots/publish-detail.jpg" width="190" alt="Published invite with fundraiser totals and guest list">
-  <img src="docs/screenshots/web-demo.jpg" width="190" alt="Guest web page with RSVP, chip-in card and chat">
+  <img src="docs/screenshots/web-guest.jpg" width="190" alt="Guest web page with RSVP, chip-in card and chat">
 </p>
 
 From left to right, the screenshots show:

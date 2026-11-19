@@ -41,6 +41,7 @@ import Observation
 
     /// A discrete action is always its own undo step.
     private func action(_ change: (inout Design) -> Void) {
+        stepStart = nil   // a gesture that never ended must not swallow later undo steps
         lastEdit = .distantPast
         edit(change)
         lastEdit = .distantPast

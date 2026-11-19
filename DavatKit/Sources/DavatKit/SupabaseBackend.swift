@@ -124,20 +124,20 @@ public final class SupabaseBackend: Backend, @unchecked Sendable {
         return rows.map(\.response)
     }
     private struct RespondParams: Encodable {
-        var inviteID: UUID, guestToken: String?, name: String, rsvp: RSVP, paid: Bool
+        var inviteID: UUID, guestToken: String?, name: String, rsvp: RSVP, paid: Bool?
         enum CodingKeys: String, CodingKey { case name, rsvp, paid; case inviteID = "invite_id", guestToken = "guest_token" }
         // guest_token has no SQL default, so send an explicit null for signed-in users
         func encode(to encoder: Encoder) throws {
             var c = encoder.container(keyedBy: CodingKeys.self)
             try c.encode(inviteID, forKey: .inviteID); try c.encode(guestToken, forKey: .guestToken)
-            try c.encode(name, forKey: .name); try c.encode(rsvp, forKey: .rsvp); try c.encode(paid, forKey: .paid)
+            try c.encode(name, forKey: .name); try c.encode(rsvp, forKey: .rsvp); try c.encodeIfPresent(paid, forKey: .paid)
         }
     }
     /// Goes through the respond() function, which upserts on user or guest token. The server keeps the row id.
     public func respond(_ r: Response) async throws {
         try await client.rpc("respond", params: RespondParams(
             inviteID: r.inviteID, guestToken: r.userID == nil ? r.guestToken : nil,
-            name: r.name, rsvp: r.rsvp, paid: r.paid)).execute()
+            name: r.name, rsvp: r.rsvp, paid: r.paid ? true : nil)).execute()
     }
     public func setPaid(responseID: UUID, paid: Bool) async throws {
         try await client.from("responses").update(["paid": paid]).eq("id", value: responseID).execute()

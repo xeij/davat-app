@@ -82,7 +82,7 @@ struct HomeView: View {
             invites = (try? await session.backend.myInvites()) ?? []
         }
         if args.contains("-demoPicker") { showPicker = true }
-        if ["-demoDetail", "-demoDetails", "-demoEditor", "-demoGuests"].contains(where: args.contains), let first = invites.first {
+        if ["-demoDetail", "-demoDetails", "-demoEditor", "-demoGuests", "-demoChat"].contains(where: args.contains), let first = invites.first {
             path = [first]
         }
         #endif

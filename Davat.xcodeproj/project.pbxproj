@@ -27,6 +27,7 @@
 		AC0711E82C6E43BEDDA11035 /* TemplatePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E047CF3508A6142C08033D6 /* TemplatePicker.swift */; };
 		BDDABD0FB8ED3C009CEA3B8D /* GuestRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BBD1762FEEE95B0AF17EB24 /* GuestRow.swift */; };
 		C63E23835584F3C26D061178 /* DavatKit in Frameworks */ = {isa = PBXBuildFile; productRef = 29F4A6C4D3414C353D112DE7 /* DavatKit */; };
+		CCF118F925D979EA399A1F6B /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A720A4BAE2F5D2E95F3E61B4 /* ChatView.swift */; };
 		CF55CAB8B9D6585219FEB14C /* EditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F296DC1ABC2908AED1DD9FF /* EditorView.swift */; };
 		DB3422BB75EE1FA556C34BD4 /* StickerPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD45D3C1515C76EBFFF9879C /* StickerPicker.swift */; };
 		F88668933A63EDA13896F04B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADF12EDB63608B1047D2E47F /* Assets.xcassets */; };
@@ -80,6 +81,7 @@
 		7E047CF3508A6142C08033D6 /* TemplatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePicker.swift; sourceTree = "<group>"; };
 		856D4BB2B877E9CD1063D064 /* DavatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DavatApp.swift; sourceTree = "<group>"; };
 		88466423B84BBF26888DDAB4 /* Davat.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Davat.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A720A4BAE2F5D2E95F3E61B4 /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		ADF12EDB63608B1047D2E47F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AE5B7EB6AF1BB76F0225D00C /* MessagesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesViewController.swift; sourceTree = "<group>"; };
 		BB80FCE0EDF86030114854B1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -225,6 +227,7 @@
 		C9171B0C770512DBDACE1C99 /* Invite */ = {
 			isa = PBXGroup;
 			children = (
+				A720A4BAE2F5D2E95F3E61B4 /* ChatView.swift */,
 				0BBD1762FEEE95B0AF17EB24 /* GuestRow.swift */,
 				ECCA34280A8A6731BE00A485 /* InviteDetailView.swift */,
 			);
@@ -375,6 +378,7 @@
 			files = (
 				4B648CD517D7657C2AC756E2 /* AuthView.swift in Sources */,
 				497C4DB175D4FDF1B48D0870 /* BackgroundPicker.swift in Sources */,
+				CCF118F925D979EA399A1F6B /* ChatView.swift in Sources */,
 				25355930FCEF6C5207A0205E /* DavatApp.swift in Sources */,
 				FD25BBFDC5DAE3B437D5BC11 /* DetailsView.swift in Sources */,
 				4F8B646C374B237F69C456D3 /* EditorModel.swift in Sources */,

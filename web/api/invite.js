@@ -75,5 +75,5 @@ module.exports = async function handler(req, res) {
     // Env-configured deploys still hand the browser its keys, even with config.js left blank.
     `<script>window.DAVAT_CONFIG=${JSON.stringify({ supabaseURL: url, supabaseAnonKey: key }).replace(/</g, "\\u003c")}</script>`,
   ].filter(Boolean);
-  send(200, page.replace("<title>davat</title>", tags.join("\n")));
+  send(200, page.replace("<title>davat</title>", () => tags.join("\n")));
 };

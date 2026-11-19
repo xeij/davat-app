@@ -39,6 +39,12 @@ test("missing date says you're invited", async () => {
   assert.ok(!res.body.includes("og:image"));
 });
 
+test("dollar patterns in the title stay literal", async () => {
+  const { res } = await call(ID, [{ title: "$$$ party $& more", starts_at: null, poster_path: null }]);
+  assert.ok(res.body.includes(`<title>$$$ party $&amp; more</title>`));
+  assert.ok(res.body.includes(`og:title" content="$$$ party $&amp; more"`));
+});
+
 test("unknown invite is a friendly 404", async () => {
   const { res } = await call(ID, []);
   assert.equal(res.statusCode, 404);

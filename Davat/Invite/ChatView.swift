@@ -9,13 +9,16 @@ struct ChatView: View {
     @State private var messages: [ChatMessage] = []
     @State private var draft = ""
     @State private var error: String?
+    @State private var sending = false
 
     private var trimmed: String { draft.trimmingCharacters(in: .whitespacesAndNewlines) }
-    private var canSend: Bool { (1...1000).contains(trimmed.count) }
+    private var canSend: Bool { !sending && (1...1000).contains(trimmed.count) }
 
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                Text("chat").font(.system(size: 34, weight: .thin))
+                    .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, 16)
                 ScrollViewReader { proxy in
                     ScrollView {
                         if messages.isEmpty {
@@ -48,7 +51,7 @@ struct ChatView: View {
                 }
                 .padding(12)
             }
-            .navigationTitle("chat").navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar { Button("Done") { dismiss() } }
         }
         .tint(.saffron)
@@ -70,7 +73,10 @@ struct ChatView: View {
     }
 
     private func reload() async {
-        do { messages = try await session.backend.messages(inviteID: invite.id) }
+        do {
+            messages = try await session.backend.messages(inviteID: invite.id).sorted { $0.createdAt < $1.createdAt }
+            error = nil
+        }
         catch is CancellationError {}
         catch { self.error = "couldn't refresh: \(error.localizedDescription)" }
     }
@@ -79,6 +85,7 @@ struct ChatView: View {
         let name = session.profile?.displayName ?? ""
         let m = ChatMessage(id: UUID(), inviteID: invite.id, name: name.isEmpty ? "host" : name,
                             userID: session.userID, body: trimmed, createdAt: .now)
+        sending = true; defer { sending = false }
         do {
             try await session.backend.send(m)
             draft = ""; error = nil

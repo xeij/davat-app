@@ -2,20 +2,19 @@ import SwiftUI
 
 /// Animated particles over the canvas. Particles are generated once per effect and positions are a
 /// pure function of time, so a frame only reads arrays and fills prebuilt paths. Reduce Motion
-/// (or `animated: false`) freezes it on a single frame.
+/// freezes it on a single frame.
 public struct EffectOverlay: View {
     let effect: Effect
-    let animated: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    public init(effect: Effect, animated: Bool = true) { self.effect = effect; self.animated = animated }
+    public init(effect: Effect) { self.effect = effect }
 
     public var body: some View {
         if effect != .none {
             let system = ParticleSystem.for(effect)
-            TimelineView(.animation(paused: reduceMotion || !animated)) { tl in
+            TimelineView(.animation(paused: reduceMotion)) { tl in
                 Canvas { ctx, size in
-                    system.draw(in: &ctx, size: size, t: reduceMotion || !animated ? 4 : tl.date.timeIntervalSinceReferenceDate)
+                    system.draw(in: &ctx, size: size, t: reduceMotion ? 4 : tl.date.timeIntervalSinceReferenceDate)
                 }
             }
             .allowsHitTesting(false)

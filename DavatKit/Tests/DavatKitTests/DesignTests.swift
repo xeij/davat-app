@@ -54,4 +54,15 @@ import Testing
         t.curve = 0.4
         #expect(t.curve == 0.4)
     }
+
+    @Test func testUnknownEffectAndPatternFallBack() throws {
+        let json = """
+        {"background":{"pattern":{"_0":"plaid","_1":{"r":1,"g":0,"b":0,"a":1},"_2":{"r":0,"g":0,"b":1,"a":1}}},
+         "layers":[],"effect":"lasers","envelope":true}
+        """
+        let d = try JSONDecoder().decode(Design.self, from: Data(json.utf8))
+        #expect(d.effect == Effect.none)
+        #expect(d.background == .color(RGBA(r: 1, g: 0, b: 0)))   // base color of the unknown pattern
+        #expect(d.envelope)
+    }
 }

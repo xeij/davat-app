@@ -23,6 +23,7 @@ public struct CanvasView: View {
                     .frame(width: size.width, height: size.height)
                     .contentShape(Rectangle())
                     .onTapGesture { selection?.wrappedValue = nil }
+                    .allowsHitTesting(selection != nil)   // display-only canvases let taps reach their container
                 ForEach(design.layers) { layer in
                     LayerView(layer: layer, unit: u, imageLoader: imageLoader)
                         .overlay {
@@ -191,7 +192,7 @@ struct TextLayerView: View {
                 // ponytail: outline is 16 offset copies; a real stroke needs Core Text paths if it ever looks rough
                 ForEach(0..<16, id: \.self) { i in
                     let a = Double(i) * .pi / 8
-                    text.foregroundStyle(o.color).offset(x: cos(a) * w, y: sin(a) * w)
+                    text.foregroundStyle(o.color).offset(x: cos(a) * w, y: sin(a) * w).accessibilityHidden(true)
                 }
             }
             if let g = t.gradient, g.count > 1 {
@@ -203,7 +204,7 @@ struct TextLayerView: View {
         .multilineTextAlignment(t.alignment == .leading ? .leading : t.alignment == .trailing ? .trailing : .center)
         .textRenderer(ArcRenderer(curve: TextLayer.clamp(t.curve)))
         .shadow(color: t.shadow ? .black.opacity(0.35) : .clear, radius: 6 * u, y: 3 * u)
-        .padding(.vertical, abs(t.curve) * t.size * u * 0.6)   // room for the bend so selection and taps cover it
+        .padding(.vertical, abs(TextLayer.clamp(t.curve)) * t.size * u * 0.6)   // room for the bend so selection and taps cover it
     }
 }
 

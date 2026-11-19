@@ -4,6 +4,9 @@ import Foundation
 public struct RGBA: Codable, Hashable, Sendable {
     public var r: Double, g: Double, b: Double, a: Double
     public init(r: Double, g: Double, b: Double, a: Double = 1) { self.r = r; self.g = g; self.b = b; self.a = a }
+    public static func hex(_ v: UInt32, _ a: Double = 1) -> RGBA {
+        RGBA(r: Double(v >> 16 & 0xFF) / 255, g: Double(v >> 8 & 0xFF) / 255, b: Double(v & 0xFF) / 255, a: a)
+    }
 }
 
 public enum PatternKind: String, Codable, CaseIterable, Sendable { case dots, stripes, grid, waves, checker, hearts, flowers, stars }
@@ -90,17 +93,29 @@ public struct Design: Codable, Hashable, Sendable {
 
     private enum CodingKeys: String, CodingKey { case background, layers, effect, envelope }
 
-    // Layers with a kind this build doesn't know (written by a newer app) are dropped, not fatal.
+    // Anything this build doesn't know (written by a newer app) degrades instead of failing the whole design:
+    // unknown layers are dropped, an unknown effect is none, an unknown pattern becomes its base color.
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        background = try c.decode(Background.self, forKey: .background)
+        if let b = try? c.decode(Background.self, forKey: .background) {
+            background = b
+        } else {
+            background = .color((try? c.decode(PatternBase.self, forKey: .background))?.pattern.base ?? RGBA(r: 1, g: 1, b: 1))
+        }
         layers = try c.decode([Lossy<Layer>].self, forKey: .layers).compactMap(\.value)
-        effect = try c.decode(Effect.self, forKey: .effect)
+        effect = (try? c.decode(Effect.self, forKey: .effect)) ?? .none
         envelope = try c.decode(Bool.self, forKey: .envelope)
     }
 }
 
 extension Design {
+    /// Every stored image this design draws: the background photo and image layers.
+    public var imagePaths: [String] {
+        var paths = layers.compactMap { if case .image(let p) = $0.kind { p } else { nil } }
+        if case .image(let p) = background { paths.insert(p, at: 0) }
+        return paths
+    }
+
     /// Appends a layer on top and returns it.
     @discardableResult
     public mutating func addLayer(_ kind: LayerKind) -> Layer {
@@ -125,6 +140,14 @@ extension Design {
         layers.insert(copy, at: i + 1)
         return copy.id
     }
+}
+
+private struct PatternBase: Decodable {
+    struct Inner: Decodable {
+        let base: RGBA
+        enum CodingKeys: String, CodingKey { case base = "_1" }
+    }
+    let pattern: Inner
 }
 
 private struct Lossy<T: Decodable>: Decodable {

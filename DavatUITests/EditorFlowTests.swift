@@ -1,14 +1,14 @@
 import XCTest
 
-/// Tap-through: + opens the picker, a template opens the editor, Done closes both and Home lists the invite.
+/// Tap-through: + opens the picker, a template opens the editor, Done goes to details, Publish lands on the
+/// invite's detail screen, which can reopen the editor and delete the invite.
 /// Expects a signed-in simulator (LocalBackend session).
 final class EditorFlowTests: XCTestCase {
-    @MainActor func testTemplateDoneSavesToHome() {
+    @MainActor func testNewInvitePublishesToDetail() {
         let app = XCUIApplication()
         app.launch()
-        let untitled = app.buttons.matching(NSPredicate(format: "label == 'untitled'"))
+        let title = "ui test \(Int(Date().timeIntervalSince1970))"
         XCTAssertTrue(app.buttons["New invite"].waitForExistence(timeout: 10))
-        let before = untitled.count
 
         app.buttons["New invite"].tap()
         let template = app.buttons["template.disco birthday"]
@@ -19,15 +19,29 @@ final class EditorFlowTests: XCTestCase {
         XCTAssertTrue(app.buttons["Done"].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
 
-        XCTAssertTrue(app.buttons["New invite"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.staticTexts["start with"].exists, "template picker should be dismissed")
-        let deadline = Date().addingTimeInterval(5)
-        while untitled.count <= before, Date() < deadline { RunLoop.current.run(until: Date().addingTimeInterval(0.2)) }
-        XCTAssertEqual(untitled.count, before + 1)
+        let field = app.textFields["title"]
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Publish"].isEnabled, "publish needs a title")
+        field.tap()
+        field.typeText(title)
+        app.buttons["Publish"].tap()
 
-        untitled.firstMatch.tap()   // a saved invite reopens in the editor
+        XCTAssertTrue(app.buttons["Share"].waitForExistence(timeout: 15))
+        XCTAssertTrue(app.staticTexts[title].exists)
+        XCTAssertFalse(app.staticTexts["start with"].exists, "template picker should be dismissed")
+
+        app.buttons["More"].tap()
+        app.buttons["Edit design"].tap()   // a published invite reopens in the editor
         XCTAssertTrue(app.buttons["Cancel"].waitForExistence(timeout: 5))
         app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.buttons["Share"].waitForExistence(timeout: 5))
+
+        app.buttons["More"].tap()
+        app.buttons["Delete"].tap()
+        app.buttons["Delete"].firstMatch.tap()
         XCTAssertTrue(app.buttons["New invite"].waitForExistence(timeout: 5))
+        let gone = NSPredicate(format: "exists == false")
+        expectation(for: gone, evaluatedWith: app.buttons[title])
+        waitForExpectations(timeout: 5)
     }
 }

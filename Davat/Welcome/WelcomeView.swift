@@ -48,7 +48,7 @@ struct WelcomeView: View {
     }
 }
 
-private extension Color {
+extension Color {
     static let saffron = Color(red: 0.851, green: 0.573, blue: 0.180)
     static let rose = Color(red: 0.62, green: 0.22, blue: 0.30)
     static let ink = Color(red: 0.09, green: 0.07, blue: 0.14)

@@ -17,7 +17,9 @@ public protocol Backend: Sendable {
     func invite(id: UUID) async throws -> Invite?            // any invite by id, for guests
     func summary(inviteID: UUID) async throws -> PublicSummary // guest-safe: no per-person paid
     func responses(inviteID: UUID) async throws -> [Response]
-    func respond(_ r: Response) async throws        // upsert
+    /// Upsert. A guest can mark themselves paid but never unmark it (paid: false keeps what's stored);
+    /// only the host unmarks, through setPaid. The stored row may keep its own id, so re-fetch after.
+    func respond(_ r: Response) async throws
     func setPaid(responseID: UUID, paid: Bool) async throws
     func messages(inviteID: UUID) async throws -> [ChatMessage]
     func send(_ m: ChatMessage) async throws
@@ -150,7 +152,7 @@ public final class LocalBackend: Backend, @unchecked Sendable {
                 old.id == r.id || (old.inviteID == r.inviteID && r.guestToken != nil && old.guestToken == r.guestToken)
                     || (old.inviteID == r.inviteID && r.userID != nil && old.userID == r.userID)
             }
-            if let n { var new = r; new.id = all[n].id; all[n] = new } else { all.append(r) }
+            if let n { var new = r; new.id = all[n].id; new.paid = r.paid || all[n].paid; all[n] = new } else { all.append(r) }
             try store("responses", all)
             notify(r.inviteID)
         }

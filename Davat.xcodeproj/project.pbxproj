@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0732DB193F1F986082006B40 /* EditorFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F0D62FAA3E047CBD649E01C /* EditorFlowTests.swift */; };
 		13D4F075C0FC38DB5A4C60E6 /* WelcomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03544E870FFBF771D0481C8 /* WelcomeView.swift */; };
 		25355930FCEF6C5207A0205E /* DavatApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 856D4BB2B877E9CD1063D064 /* DavatApp.swift */; };
 		39F7E507EA969C132CA67FBB /* FontPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 282279F68B35044727D9B2D7 /* FontPicker.swift */; };
@@ -24,12 +25,23 @@
 		F88668933A63EDA13896F04B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ADF12EDB63608B1047D2E47F /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		94D6E9CD7B03CFB8E95364E4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 27A581B0DD3ABDA04485F70F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 01EC8BAA7B3C401124A15B58;
+			remoteInfo = Davat;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		0CD3186B51361ECA5AA38B27 /* EditorModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorModel.swift; sourceTree = "<group>"; };
 		282279F68B35044727D9B2D7 /* FontPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontPicker.swift; sourceTree = "<group>"; };
 		3F296DC1ABC2908AED1DD9FF /* EditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorView.swift; sourceTree = "<group>"; };
 		45CBED3FBCB7E6EB87BA49E5 /* LayerInspector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayerInspector.swift; sourceTree = "<group>"; };
 		49DBA636FC25302542CE6B76 /* Davat.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Davat.entitlements; sourceTree = "<group>"; };
+		4F0D62FAA3E047CBD649E01C /* EditorFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorFlowTests.swift; sourceTree = "<group>"; };
 		7E047CF3508A6142C08033D6 /* TemplatePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplatePicker.swift; sourceTree = "<group>"; };
 		856D4BB2B877E9CD1063D064 /* DavatApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DavatApp.swift; sourceTree = "<group>"; };
 		88466423B84BBF26888DDAB4 /* Davat.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Davat.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -41,6 +53,7 @@
 		CE5EDAAE65D015DE05E30D50 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		DAA690FFCCECAD0158DB6BEF /* Session.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Session.swift; sourceTree = "<group>"; };
 		DD45D3C1515C76EBFFF9879C /* StickerPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickerPicker.swift; sourceTree = "<group>"; };
+		DF576D7AD3547C0AEEF13783 /* DavatUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = DavatUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E35B015C9395A0EF56FCA21F /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		FAD8E3F824AA2DC624B1E80A /* BackgroundPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundPicker.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -79,6 +92,14 @@
 			path = Editor;
 			sourceTree = "<group>";
 		};
+		2C32278A54812BD338168F9C /* DavatUITests */ = {
+			isa = PBXGroup;
+			children = (
+				4F0D62FAA3E047CBD649E01C /* EditorFlowTests.swift */,
+			);
+			path = DavatUITests;
+			sourceTree = "<group>";
+		};
 		3BCB4F82130CCA94FCAFD5A7 /* Davat */ = {
 			isa = PBXGroup;
 			children = (
@@ -100,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				88466423B84BBF26888DDAB4 /* Davat.app */,
+				DF576D7AD3547C0AEEF13783 /* DavatUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,6 +138,7 @@
 			isa = PBXGroup;
 			children = (
 				3BCB4F82130CCA94FCAFD5A7 /* Davat */,
+				2C32278A54812BD338168F9C /* DavatUITests */,
 				E9518ECE9A9A960746723F04 /* Packages */,
 				5FFD0BD57D3903DF971F2DB2 /* Products */,
 			);
@@ -168,6 +191,24 @@
 			productReference = 88466423B84BBF26888DDAB4 /* Davat.app */;
 			productType = "com.apple.product-type.application";
 		};
+		59A38ED155F2C7222B1FDA46 /* DavatUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C20E5B16B53E1048C4174CE0 /* Build configuration list for PBXNativeTarget "DavatUITests" */;
+			buildPhases = (
+				4CF9A4C3C6FB7FAA0685A7E3 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0867D7CF420AFA80B3969E4D /* PBXTargetDependency */,
+			);
+			name = DavatUITests;
+			packageProductDependencies = (
+			);
+			productName = DavatUITests;
+			productReference = DF576D7AD3547C0AEEF13783 /* DavatUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -180,6 +221,11 @@
 					01EC8BAA7B3C401124A15B58 = {
 						DevelopmentTeam = "";
 						ProvisioningStyle = Automatic;
+					};
+					59A38ED155F2C7222B1FDA46 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+						TestTargetID = 01EC8BAA7B3C401124A15B58;
 					};
 				};
 			};
@@ -201,6 +247,7 @@
 			projectRoot = "";
 			targets = (
 				01EC8BAA7B3C401124A15B58 /* Davat */,
+				59A38ED155F2C7222B1FDA46 /* DavatUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -237,9 +284,42 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4CF9A4C3C6FB7FAA0685A7E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0732DB193F1F986082006B40 /* EditorFlowTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		0867D7CF420AFA80B3969E4D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 01EC8BAA7B3C401124A15B58 /* Davat */;
+			targetProxy = 94D6E9CD7B03CFB8E95364E4 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0F91AD0BE3BEAEC956F09A8F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.davat.app.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Davat;
+			};
+			name = Release;
+		};
 		7CF012346B91156B6D3E7F5B /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -297,6 +377,23 @@
 				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
+		};
+		84B6B00FB5DB671EFD5701D7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.davat.app.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Davat;
+			};
+			name = Debug;
 		};
 		A291B091D2EDFFE409D3DBA9 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -407,6 +504,15 @@
 			buildConfigurations = (
 				A291B091D2EDFFE409D3DBA9 /* Debug */,
 				7CF012346B91156B6D3E7F5B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C20E5B16B53E1048C4174CE0 /* Build configuration list for PBXNativeTarget "DavatUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84B6B00FB5DB671EFD5701D7 /* Debug */,
+				0F91AD0BE3BEAEC956F09A8F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

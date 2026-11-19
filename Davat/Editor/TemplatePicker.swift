@@ -42,7 +42,12 @@ struct TemplatePicker: View {
                     .matchedTransitionSource(id: name, in: zoom)
                 Text(name).font(.subheadline.weight(.light)).foregroundStyle(.primary)
             }
+            .contentShape(.rect)
         }
         .buttonStyle(.plain)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(name)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityIdentifier("template.\(name)")
     }
 }

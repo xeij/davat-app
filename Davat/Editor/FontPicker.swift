@@ -42,7 +42,7 @@ struct FontPicker: View {
                     HStack(spacing: 8) {
                         ForEach(faces, id: \.self) { face in
                             Button { fontName = face } label: {
-                                Text(face.split(separator: "-").last.map(String.init) ?? face).font(.custom(face, fixedSize: 15))
+                                Text(Self.faceName(face)).font(.custom(face, fixedSize: 15))
                             }
                             .buttonStyle(.glass)
                             .tint(face == fontName ? .accentColor : nil)
@@ -51,6 +51,11 @@ struct FontPicker: View {
                 }
             }
         }
+    }
+
+    /// "regular", "bold italic": the face as the font describes it, not the PostScript suffix.
+    static func faceName(_ postScript: String) -> String {
+        (UIFont(name: postScript, size: 15)?.fontDescriptor.object(forKey: .face) as? String)?.lowercased() ?? "regular"
     }
 
     /// The plainest face of a family: the shortest PostScript name ("Didot", not "Didot-Italic").

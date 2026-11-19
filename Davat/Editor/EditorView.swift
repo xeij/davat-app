@@ -128,6 +128,7 @@ struct EditorView: View {
             .onChanged { v in
                 guard let l = model.selected else { return }
                 let start = dragStart ?? CGPoint(x: l.x, y: l.y)
+                if dragStart == nil { model.beginStep() }
                 dragStart = start
                 var x = min(max(start.x + v.translation.width / canvasSize.width, -0.2), 1.2)
                 var y = min(max(start.y + v.translation.height / canvasSize.height, -0.2), 1.2)
@@ -138,27 +139,35 @@ struct EditorView: View {
                 snapX = sx; snapY = sy
                 model.editSelected { $0.x = x; $0.y = y }
             }
-            .onEnded { _ in dragStart = nil; snapX = false; snapY = false }
+            .onEnded { _ in dragStart = nil; snapX = false; snapY = false; endStepIfIdle() }
         let pinch = MagnifyGesture()
             .onChanged { v in
                 guard let l = model.selected else { return }
                 let start = scaleStart ?? l.scale
+                if scaleStart == nil { model.beginStep() }
                 scaleStart = start
-                model.editSelected { $0.scale = min(max(start * v.magnification, 0.1), 12) }
+                let range = EditorModel.scaleRange
+                model.editSelected { $0.scale = min(max(start * v.magnification, range.lowerBound), range.upperBound) }
             }
-            .onEnded { _ in scaleStart = nil }
+            .onEnded { _ in scaleStart = nil; endStepIfIdle() }
         let rotate = RotateGesture()
             .onChanged { v in
                 guard let l = model.selected else { return }
                 let start = rotationStart ?? l.rotation
+                if rotationStart == nil { model.beginStep() }
                 rotationStart = start
-                var r = start + v.rotation.degrees
+                var r = remainder(start + v.rotation.degrees, 360)   // keep within -180...180 like the slider
                 let nearest = (r / 45).rounded() * 45
                 if abs(r - nearest) < 3 { r = nearest }
                 model.editSelected { $0.rotation = r }
             }
-            .onEnded { _ in rotationStart = nil }
+            .onEnded { _ in rotationStart = nil; endStepIfIdle() }
         return drag.simultaneously(with: pinch).simultaneously(with: rotate)
+    }
+
+    /// One undo step per touch, closed when the last of the simultaneous gestures ends.
+    private func endStepIfIdle() {
+        if dragStart == nil, scaleStart == nil, rotationStart == nil { model.endStep() }
     }
 
     private var toolbar: some View {
@@ -220,7 +229,7 @@ struct EditorView: View {
 
     /// Uploads an image and puts it on the canvas as the background or a new layer.
     private func place(_ data: Data, asBackground: Bool) async {
-        guard let uid = session.userID else { return }
+        guard let uid = session.userID else { error = "sign in again to add images"; return }
         do {
             let path = try await session.images.upload(data, userID: uid)
             if asBackground { model.edit { $0.background = .image(path: path) } } else { model.add(.image(path: path)) }

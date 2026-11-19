@@ -8,6 +8,7 @@ struct HomeView: View {
     @State private var showPicker = false
     @State private var editing: Invite?
     @State private var error: String?
+    @State private var imagesReady = 0
     @Namespace private var zoom
 
     var body: some View {
@@ -28,11 +29,16 @@ struct HomeView: View {
                                             .matchedTransitionSource(id: invite.id, in: zoom)
                                         Text(invite.title).font(.subheadline.weight(.light))
                                     }
+                                    .contentShape(.rect)
                                 }
                                 .buttonStyle(.plain)
+                                .accessibilityElement(children: .ignore)
+                                .accessibilityLabel(invite.title)
+                                .accessibilityAddTraits(.isButton)
                             }
                         }
                         .padding(.horizontal, 20).padding(.bottom, 100)
+                        .id(imagesReady)
                     }
                 }
             }
@@ -71,9 +77,8 @@ struct HomeView: View {
     }
 
     private func load() async {
-        let all = (try? await session.backend.myInvites()) ?? []
-        for i in all { await session.images.prefetch(i.design) }   // so remote images are ready before first draw
-        invites = all
+        invites = (try? await session.backend.myInvites()) ?? []
+        await prefetch()
         #if DEBUG
         let args = ProcessInfo.processInfo.arguments
         if args.contains("-demoSeed"), invites.isEmpty {
@@ -86,6 +91,14 @@ struct HomeView: View {
         if args.contains("-demoPicker") { showPicker = true }
         if args.contains("-demoEditor") { editing = invites.first }
         #endif
+    }
+
+    /// Remote images land in the image cache, then the grid redraws to pick them up.
+    private func prefetch() async {
+        let paths = invites.flatMap(\.design.imagePaths)
+        guard !paths.isEmpty else { return }
+        await session.images.prefetch(paths: paths)
+        imagesReady += 1
     }
 
     private func save(_ invite: Invite) {

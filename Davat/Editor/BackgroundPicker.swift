@@ -85,7 +85,9 @@ struct BackgroundPicker: View {
                         var s = stops; s[i] = c; set(.gradient(s, angle: angle))
                     }).color).labelsHidden()
                 }
-                Button("Add stop", systemImage: "plus") { set(.gradient(stops + [stops.last!], angle: angle)) }
+                Button("Add stop", systemImage: "plus") {
+                    if let last = stops.last { set(.gradient(stops + [last], angle: angle)) }
+                }
                     .labelStyle(.iconOnly).buttonStyle(.glass).disabled(stops.count >= 6)
                 if stops.count > 2 {
                     Button("Remove stop", systemImage: "minus") { set(.gradient(Array(stops.dropLast()), angle: angle)) }

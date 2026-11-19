@@ -38,10 +38,22 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         TARGETED_DEVICE_FAMILY: "1"
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  DavatUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [DavatUITests]
+    dependencies:
+      - target: Davat
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.davat.app.uitests
+        GENERATE_INFOPLIST_FILE: YES
 schemes:
   Davat:
     build:
       targets:
         Davat: all
+    test:
+      targets: [DavatUITests]
     run:
       config: Debug

@@ -17,7 +17,7 @@ struct LayerInspector: View {
                     case .image: EmptyView()
                     }
                     Group {
-                        LabeledSlider(label: "size", value: model.layerBinding(\.scale), range: 0.1...8)
+                        LabeledSlider(label: "size", value: model.layerBinding(\.scale), range: EditorModel.scaleRange)
                         LabeledSlider(label: "rotate", value: model.layerBinding(\.rotation), range: -180...180)
                         LabeledSlider(label: "opacity", value: model.layerBinding(\.opacity), range: 0.05...1)
                     }
@@ -171,12 +171,6 @@ struct Swatches: View {
                 .padding(4)
             }
         }
-    }
-}
-
-extension RGBA {
-    static func hex(_ v: UInt32) -> RGBA {
-        RGBA(r: Double(v >> 16 & 0xFF) / 255, g: Double(v >> 8 & 0xFF) / 255, b: Double(v & 0xFF) / 255)
     }
 }
 

@@ -9,17 +9,20 @@ import Observation
     private(set) var canRedo = false
     @ObservationIgnored let undoManager = UndoManager()
     @ObservationIgnored private var lastEdit = Date.distantPast
+    @ObservationIgnored private var stepStart: Design?
+    static let scaleRange = 0.1...8.0
 
     init(design: Design) { self.design = design }
 
     var selected: Layer? { design.layers.first { $0.id == selection } }
 
-    /// Every change goes through here. Edits less than 0.6s apart (a drag, a slider) share one undo step.
+    /// Every change goes through here. Inside a begin/endStep pair (a gesture) nothing registers until
+    /// the end; otherwise edits less than 0.6s apart (a slider) share one undo step.
     func edit(_ change: (inout Design) -> Void) {
         let old = design
         change(&design)
         guard design != old else { return }
-        if Date.now.timeIntervalSince(lastEdit) > 0.6 { registerUndo(old) }
+        if stepStart == nil, Date.now.timeIntervalSince(lastEdit) > 0.6 { registerUndo(old) }
         lastEdit = .now
         refresh()
     }
@@ -27,6 +30,20 @@ import Observation
     func editSelected(_ change: (inout Layer) -> Void) {
         guard let id = selection else { return }
         edit { d in if let i = d.layers.firstIndex(where: { $0.id == id }) { change(&d.layers[i]) } }
+    }
+
+    func beginStep() { if stepStart == nil { stepStart = design } }
+    func endStep() {
+        if let start = stepStart, start != design { registerUndo(start); refresh() }
+        stepStart = nil
+        lastEdit = .distantPast
+    }
+
+    /// A discrete action is always its own undo step.
+    private func action(_ change: (inout Design) -> Void) {
+        lastEdit = .distantPast
+        edit(change)
+        lastEdit = .distantPast
     }
 
     private func registerUndo(_ old: Design) {
@@ -48,19 +65,18 @@ import Observation
 
     func add(_ kind: LayerKind) {
         var id: UUID?
-        edit { id = $0.addLayer(kind).id }
+        action { id = $0.addLayer(kind).id }
         selection = id
-        lastEdit = .distantPast   // adding is its own undo step
     }
     func delete(_ id: UUID) {
-        edit { $0.layers.removeAll { $0.id == id } }
+        action { $0.layers.removeAll { $0.id == id } }
         if selection == id { selection = nil }
     }
-    func bringForward(_ id: UUID) { edit { $0.moveLayer(id: id, by: 1) } }
-    func sendBackward(_ id: UUID) { edit { $0.moveLayer(id: id, by: -1) } }
+    func bringForward(_ id: UUID) { action { $0.moveLayer(id: id, by: 1) } }
+    func sendBackward(_ id: UUID) { action { $0.moveLayer(id: id, by: -1) } }
     func duplicate(_ id: UUID) {
         var copy: UUID?
-        edit { copy = $0.duplicateLayer(id: id) }
+        action { copy = $0.duplicateLayer(id: id) }
         selection = copy
     }
 }
